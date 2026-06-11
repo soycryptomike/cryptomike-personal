@@ -499,7 +499,9 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
 function setExecOrderType(sym, uid, type) {
   var btns = document.querySelectorAll('#exec-types-' + uid + ' .exec-type-btn');
-  btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit'); });
+  if (btns) {
+      btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit'); });
+  }
   var btn = document.getElementById('exec-' + type + '-' + uid);
   if (btn) btn.classList.add('sel-' + type);
   var info = document.getElementById('exec-typeinfo-' + uid);
@@ -685,7 +687,7 @@ function buildSignalCard(text, senal) {
   var confPct = senal.confidence ? (senal.confidence * 10) : 0;
   var confColor = confPct >= 70 ? 'var(--up)' : confPct >= 50 ? 'var(--warn)' : 'var(--down)';
   
-  var uid = Date.now() + Math.floor(Math.random()*1000);
+  var uid = 'card_' + Date.now() + '_' + Math.floor(Math.random()*1000);
 
   var badgeClass = 'badge-neutral';
   var badgeText = 'ANALISIS';
@@ -725,7 +727,7 @@ function buildSignalCard(text, senal) {
     execPanel = '<div class="signal-execute">' +
       '<div class="signal-execute-title">Ejecutar operativa</div>' +
       '<div class="exec-grid">' +
-        '<div class="exec-field"><label>USDT</label><input type="number" id="exec-usdt-' + uid + '" value="20" placeholder="20" /></div>' +
+        '<div class="exec-field"><label>USDT</label><input type="number" id="exec-usdt-' + uid + '" value="" placeholder="Ej: 20" /></div>' +
         '<div class="exec-field"><label>ENTRADA $</label><input type="text" id="exec-entry-' + uid + '" class="live-entry-' + sym + '" value="' + formatInput(execEntry) + '" /></div>' +
         '<div class="exec-field"><label>APAL.</label><input type="number" id="exec-lev-' + uid + '" value="10" min="1" max="100" /></div>' +
         '<div class="exec-field"><label>SL $</label><input type="text" id="exec-sl-' + uid + '" value="' + formatInput(execSL) + '" /></div>' +
@@ -801,7 +803,6 @@ function enviarMensaje(msg) {
   setLoading(true);
   conversationHistory.push({ role: 'user', content: msg });
 
-  // REGLAS BLINDADAS DE COHERENCIA LÓGICA
   var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Analizas CUALQUIER criptomoneda en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nREGLA VITAL DE FORMATO: Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n\nREGLAS VITALES DE COHERENCIA LOGICA:\n1. Si la Direccion es LONG: El Stop Loss TIENE QUE SER MENOR que la Entrada. Los Take Profit TIENEN QUE SER MAYORES que la Entrada. El sesgo debe ser ALCISTA.\n2. Si la Direccion es SHORT: El Stop Loss TIENE QUE SER MAYOR que la Entrada. Los Take Profit TIENEN QUE SER MENORES que la Entrada. El sesgo debe ser BAJISTA.\n3. NUNCA des una direccion LONG si tu SL es mayor a la entrada, y NUNCA des un SHORT si tu SL es menor.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / ESPERAR\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE\n- Razon: [explicacion breve]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.\n\nCOMANDOS: SETUP=solo setup y tipo de orden | FUNDAMENTAL=solo fundamental | NOTICIAS=5 catalizadores con impacto | COMPARAR=tabla+veredicto | RIESGO [capital] [entrada] [stop]=calculo posicion';
 
   fetch('https://api.anthropic.com/v1/messages', {
