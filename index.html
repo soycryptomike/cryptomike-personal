@@ -270,6 +270,9 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
       <div class="s-label">Comandos rapidos</div>
       <div class="s-block">
         <div class="cmd-grid">
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
           <div class="cmd-btn" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
           <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
           <div class="cmd-btn" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
@@ -277,11 +280,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
           <div class="cmd-btn" onclick="sendCmd('SETUP XRP')">SETUP XRP</div>
           <div class="cmd-btn" onclick="sendCmd('SETUP HBAR')">SETUP HBAR</div>
           <div class="cmd-btn" onclick="sendCmd('COMPARAR XLM XRP')">XLM vs XRP</div>
-          <div class="cmd-btn" onclick="sendCmd('COMPARAR XLM HBAR')">XLM vs HBAR</div>
-          <div class="cmd-btn" onclick="sendCmd('NOTICIAS XLM')">NOTICIAS XLM</div>
-          <div class="cmd-btn" onclick="sendCmd('NOTICIAS XRP')">NOTICIAS XRP</div>
-          <div class="cmd-btn" onclick="sendCmd('FUNDAMENTAL XLM')">FUND. XLM</div>
-          <div class="cmd-btn" onclick="sendCmd('FUNDAMENTAL HBAR')">FUND. HBAR</div>
         </div>
       </div>
     </div>
@@ -298,8 +296,8 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
       <div class="s-block">
         <div class="risk-grid">
           <div class="field" style="margin:0"><label>Capital $</label><input type="number" id="rCapital" placeholder="1000" style="font-size:11px;padding:6px 7px" /></div>
-          <div class="field" style="margin:0"><label>Entrada $</label><input type="number" id="rEntrada" placeholder="0.202" step="0.0001" style="font-size:11px;padding:6px 7px" /></div>
-          <div class="field" style="margin:0"><label>Stop $</label><input type="number" id="rStop" placeholder="0.195" step="0.0001" style="font-size:11px;padding:6px 7px" /></div>
+          <div class="field" style="margin:0"><label>Entrada $</label><input type="text" id="rEntrada" placeholder="0.202" style="font-size:11px;padding:6px 7px" /></div>
+          <div class="field" style="margin:0"><label>Stop $</label><input type="text" id="rStop" placeholder="0.195" style="font-size:11px;padding:6px 7px" /></div>
         </div>
         <button class="btn btn-ghost" style="margin-bottom:8px" onclick="calcularRiesgo()">Calcular</button>
         <div id="riskResults" style="display:none">
@@ -320,10 +318,10 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
         <h2>CryptoMike Personal Trader</h2>
         <p>Analiza con Claude, recibe senales estructuradas con niveles exactos y ejecuta ordenes a mercado, limite o stop directamente desde aqui.</p>
         <div class="welcome-cmds">
+          <div class="welcome-cmd" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
+          <div class="welcome-cmd" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
+          <div class="welcome-cmd" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
           <div class="welcome-cmd" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
-          <div class="welcome-cmd" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
-          <div class="welcome-cmd" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
-          <div class="welcome-cmd" onclick="sendCmd('SETUP XLM')">SETUP XLM</div>
         </div>
       </div>
     </div>
@@ -336,7 +334,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
       </div>
-      <div class="input-hint">ANALIZA · SETUP · COMPARAR · FUNDAMENTAL · NOTICIAS · RIESGO [capital] [entrada] [stop]</div>
+      <div class="input-hint">ANALIZA [activo] · SETUP [activo] · FUNDAMENTAL [activo]</div>
     </div>
   </div>
 </div>
@@ -346,11 +344,19 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 <script>
 var RENDER_SERVER = 'https://cryptomike-server.onrender.com';
 var conversationHistory = [];
-var prices = { XLM: null, XRP: null, HBAR: null };
+var prices = { XLM: null, XRP: null, HBAR: null, BTC: null, ETH: null, SOL: null };
 var priceInterval = null;
 var activeExchange = 'bitunix';
 var loadingEl = null;
 
+// FUNCIÓN LIMPIADORA PARA ASEGURAR QUE LAS COMAS SEAN PUNTOS DECIMALES
+function getVal(id) {
+  var el = document.getElementById(id);
+  if (!el || !el.value) return 0;
+  return parseFloat(el.value.replace(/,/g, '.'));
+}
+
+// ═══ EXCHANGE ═══
 function selectExchange(ex) {
   activeExchange = ex;
   ['bitunix','bitmart'].forEach(function(e) {
@@ -366,6 +372,7 @@ function sideTab(el, panelId) {
   document.getElementById(panelId).classList.add('active');
 }
 
+// ═══ CONEXION ═══
 function conectar() {
   var ak = document.getElementById('anthropicKey').value.trim();
   if (!ak) { showToast('Introduce tu Anthropic API Key', 'error'); return; }
@@ -383,6 +390,7 @@ function conectar() {
   setInterval(fetchPositions, 30000);
 }
 
+// ═══ PRECIOS ═══
 function fetchPrices() {
   var syms = { XLM: 'XLMUSDT', XRP: 'XRPUSDT', HBAR: 'HBARUSDT' };
   Object.keys(syms).forEach(function(sym) {
@@ -406,10 +414,10 @@ function fetchPrices() {
 function seleccionarActivo(sym) {
   document.querySelectorAll('.asset-card').forEach(function(c) { c.classList.remove('active'); });
   document.getElementById('card-' + sym).classList.add('active');
-  var precio = prices[sym] ? '$' + prices[sym].toFixed(4) : '';
-  sendCmd('ANALIZA ' + sym + (precio ? ' ' + precio : ''));
+  sendCmd('ANALIZA ' + sym);
 }
 
+// ═══ SERVER REQUESTS ═══
 function srvReq(url, body) {
   return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     .then(function(r) { return r.json(); }).catch(function(e) { showToast('Error red: ' + e.message, 'error'); return null; });
@@ -430,11 +438,13 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
+// ═══ EJECUTAR ORDEN (desde signal card) ═══
 function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
-  var usdt = parseFloat(document.getElementById('exec-usdt-' + sym).value);
-  var entradaFinal = parseFloat(document.getElementById('exec-entry-' + sym).value) || entrada;
-  var slFinal = parseFloat(document.getElementById('exec-sl-' + sym).value) || sl;
-  var tpFinal = parseFloat(document.getElementById('exec-tp-' + sym).value) || tp;
+  // AQUÍ ESTÁ LA MAGIA PARA QUE LAS COMAS NO ROMPAN BITUNIX
+  var usdt = getVal('exec-usdt-' + sym);
+  var entradaFinal = getVal('exec-entry-' + sym) || entrada;
+  var slFinal = getVal('exec-sl-' + sym) || sl;
+  var tpFinal = getVal('exec-tp-' + sym) || tp;
   var lev = parseInt(document.getElementById('exec-lev-' + sym).value) || leverage;
 
   if (!usdt || usdt <= 0) { showToast('Introduce la cantidad en USDT', 'error'); return; }
@@ -444,14 +454,11 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
   var precio = prices[sym] || entradaFinal;
   if (!precio) { showToast('Precio no disponible', 'error'); return; }
 
-  var typesContainer = document.getElementById('exec-types-' + sym);
-  if (typesContainer) {
-    var ot = typesContainer.querySelector('.sel-market, .sel-limit, .sel-stop');
-    if (ot) {
-      if (ot.classList.contains('sel-market')) orderType = 'market';
-      else if (ot.classList.contains('sel-limit')) orderType = 'limit';
-      else orderType = 'stop';
-    }
+  var ot = document.querySelector('#exec-types-' + sym + ' .sel-market, #exec-types-' + sym + ' .sel-limit, #exec-types-' + sym + ' .sel-stop');
+  if (ot) {
+    if (ot.classList.contains('sel-market')) orderType = 'market';
+    else if (ot.classList.contains('sel-limit')) orderType = 'limit';
+    else orderType = 'stop';
   }
 
   var precioEjecucion = orderType === 'market' ? precio : entradaFinal;
@@ -463,10 +470,8 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
       showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
       var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
       if (orderType === 'limit' || orderType === 'stop') {
-        orderBody.orderType = orderType === 'limit' ? 'LIMIT' : 'STOP';
+        orderBody.orderType = orderType;
         orderBody.price = entradaFinal;
-      } else {
-        orderBody.orderType = 'MARKET';
       }
       return bitunixReq('order', orderBody);
     }).then(function(res) {
@@ -538,6 +543,7 @@ function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderTy
   document.getElementById('chatArea').scrollTop = 99999;
 }
 
+// ═══ POSICIONES ═══
 function fetchPositions() {
   var apiKey = activeExchange === 'bitunix' ? document.getElementById('bitunixKey').value.trim() : document.getElementById('bitmartKey').value.trim();
   if (!apiKey) return;
@@ -555,7 +561,7 @@ function fetchPositions() {
     }
     var container = document.getElementById('posicionesContainer');
     if (!positions.length) {
-      container.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:20px 0;font-family:\'Space Mono\',monospace;">Sin posiciones abiertas</div>';
+      container.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:20px 0;">Sin posiciones abiertas</div>';
     } else {
       container.innerHTML = positions.map(function(p) {
         return '<div class="position-card"><div class="pos-header"><div class="pos-symbol">' + p.symbol + '</div><div class="pos-side ' + (p.side === 'LONG' ? 'pos-long' : 'pos-short') + '">' + p.side + '</div></div>' +
@@ -566,12 +572,10 @@ function fetchPositions() {
   }).catch(function() {});
 }
 
+// ═══ SISTEMA DINÁMICO DE BÚSQUEDA (EL NUEVO CEREBRO) ═══
 function sendCmd(cmd) {
-  var parts = cmd.split(' ');
-  if ((parts[0] === 'ANALIZA' || parts[0] === 'SETUP') && parts.length === 2 && prices[parts[1]]) {
-    cmd = parts[0] + ' ' + parts[1] + ' $' + prices[parts[1]].toFixed(4);
-  }
-  enviarMensaje(cmd);
+  document.getElementById('userInput').value = cmd;
+  enviar();
 }
 
 function enviar() {
@@ -579,7 +583,32 @@ function enviar() {
   var msg = input.value.trim();
   if (!msg) return;
   input.value = '';
-  enviarMensaje(msg);
+
+  var parts = msg.split(' ');
+  var cmd = parts[0].toUpperCase();
+  
+  // Si le pedimos un análisis o setup, buscar el precio en tiempo real de ESA moneda
+  if ((cmd === 'ANALIZA' || cmd === 'SETUP' || cmd === 'FUNDAMENTAL') && parts.length >= 2) {
+    var sym = parts[1].toUpperCase();
+    setLoading(true);
+    
+    // Conexión relámpago a Binance para cualquier par
+    fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + 'USDT')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        setLoading(false);
+        if(d.price) {
+          prices[sym] = parseFloat(d.price);
+          msg = cmd + ' ' + sym + ' $' + parseFloat(d.price).toFixed(4);
+        }
+        enviarMensaje(msg);
+      }).catch(function() {
+        setLoading(false);
+        enviarMensaje(msg); // Si falla (ej. moneda rara), lo manda sin precio
+      });
+  } else {
+    enviarMensaje(msg);
+  }
 }
 
 function parsearSenal(text) {
@@ -590,10 +619,11 @@ function parsearSenal(text) {
     ratioTp1: null, structure: null, sesgo: null
   };
 
-  var m = text.match(/ANALISIS\s+([A-Z]+)[\s\/].*?\$([\d.]+)/i) || text.match(/([A-Z]{3,4})\s*[|/]\s*\$([\d.]+)/);
+  // Extrae de forma dinámica cualquier asset de 3 a 5 letras
+  var m = text.match(/ANALISIS\s+([A-Z]+)[\s\/].*?\$([\d.]+)/i) || text.match(/([A-Z]{3,5})\s*[|/]\s*\$([\d.]+)/);
   if (m) { data.asset = m[1]; data.price = parseFloat(m[2]); }
   if (!data.asset) {
-    var am = text.match(/\b(XLM|XRP|HBAR)\b/);
+    var am = text.match(/\b(BTC|ETH|SOL|XLM|XRP|HBAR|[A-Z]{3,5})\b/);
     if (am) data.asset = am[1];
   }
 
@@ -683,7 +713,6 @@ function buildSignalCard(text, senal) {
   var tp3Val = senal.tp3 ? '$' + senal.tp3.toFixed(4) : '';
 
   var riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
-  var capital = 100; 
   var execEntry = senal.entry || (precioActual || 0);
   var execSL = senal.sl || 0;
 
@@ -694,10 +723,10 @@ function buildSignalCard(text, senal) {
       '<div class="signal-execute-title">Ejecutar operativa</div>' +
       '<div class="exec-grid">' +
         '<div class="exec-field"><label>USDT</label><input type="number" id="exec-usdt-' + sym + '" value="20" placeholder="20" /></div>' +
-        '<div class="exec-field"><label>ENTRADA $</label><input type="number" id="exec-entry-' + sym + '" value="' + (execEntry > 0 ? execEntry.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>ENTRADA $</label><input type="text" id="exec-entry-' + sym + '" value="' + (execEntry > 0 ? execEntry.toFixed(4) : '') + '" /></div>' +
         '<div class="exec-field"><label>APAL.</label><input type="number" id="exec-lev-' + sym + '" value="10" min="1" max="100" /></div>' +
-        '<div class="exec-field"><label>SL $</label><input type="number" id="exec-sl-' + sym + '" value="' + (execSL > 0 ? execSL.toFixed(4) : '') + '" step="0.0001" /></div>' +
-        '<div class="exec-field"><label>TP $</label><input type="number" id="exec-tp-' + sym + '" value="' + (senal.tp1 ? senal.tp1.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>SL $</label><input type="text" id="exec-sl-' + sym + '" value="' + (execSL > 0 ? execSL.toFixed(4) : '') + '" /></div>' +
+        '<div class="exec-field"><label>TP $</label><input type="text" id="exec-tp-' + sym + '" value="' + (senal.tp1 ? senal.tp1.toFixed(4) : '') + '" /></div>' +
         '<div class="exec-field"><label>USDT riesgo</label><input type="text" id="exec-risk-' + sym + '" value="--" readonly style="color:var(--text3)" /></div>' +
       '</div>' +
       '<div class="exec-type-row" id="exec-types-' + sym + '">' +
@@ -770,7 +799,8 @@ function enviarMensaje(msg) {
   setLoading(true);
   conversationHistory.push({ role: 'user', content: msg });
 
-  var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Activos: XLM, XRP, HBAR en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Ratio minimo 1:3. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nCATALIZADORES: XLM=DTCC 2027 ONU MoneyGram Franklin Templeton 569M RWA CME futuros ISO 20022. XRP=ETF spot 1.2B CLARITY Act SEC resuelto. HBAR=ETF Canary Nasdaq 549M OKCoin Japan Bank of England DLT.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / SIN POSICION\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE / STOP\n- Razon: [explicacion breve de por que ese tipo de orden segun el contexto tecnico]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.\n\nCOMANDOS: SETUP=solo setup y tipo de orden | FUNDAMENTAL=solo fundamental | NOTICIAS=5 catalizadores con impacto | COMPARAR=tabla+veredicto | RIESGO [capital] [entrada] [stop]=calculo posicion';
+  // NUEVO PROMPT ABIERTO A CUALQUIER CRYPTO
+  var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Analizas CUALQUIER criptomoneda (BTC, ETH, SOL, etc.) en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Ratio minimo 1:3. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / SIN POSICION\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE / STOP\n- Razon: [explicacion breve de por que ese tipo de orden segun el contexto tecnico]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.\n\nCOMANDOS: SETUP=solo setup y tipo de orden | FUNDAMENTAL=solo fundamental | NOTICIAS=5 catalizadores con impacto | COMPARAR=tabla+veredicto | RIESGO [capital] [entrada] [stop]=calculo posicion';
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -844,10 +874,10 @@ function agregarMensajeTexto(text) {
 }
 
 function calcularRiesgo() {
-  var capital = parseFloat(document.getElementById('rCapital').value);
-  var entrada = parseFloat(document.getElementById('rEntrada').value);
-  var stop = parseFloat(document.getElementById('rStop').value);
-  var riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
+  var capital = getVal('rCapital');
+  var entrada = getVal('rEntrada');
+  var stop = getVal('rStop');
+  var riskPct = getVal('riskPct') || 2;
   if (!capital || !entrada || !stop) { showToast('Rellena todos los campos', 'error'); return; }
   var ur = capital * (riskPct / 100);
   var sp = Math.abs((entrada - stop) / entrada * 100);
