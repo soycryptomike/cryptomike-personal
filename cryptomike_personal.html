@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoMike Personal Trader</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;--border:#23232e;--border2:#2e2e3e;
+  --text:#f0f0f5;--text2:#9090a8;--text3:#5a5a70;
+  --accent:#c8f135;--accent2:#9bbc1a;
+  --up:#4ade80;--down:#f87171;--warn:#fbbf24;--gold:#FFD700;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+.header{border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(10,10,15,0.97);backdrop-filter:blur(12px);z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0a0a0f;font-family:'Space Mono',monospace;}
+.logo-text{font-size:14px;font-weight:600;}
+.logo-sub{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);display:inline-block;margin-right:5px;}
+.status-dot.live{background:var(--up);box-shadow:0 0 6px var(--up);}
+.status-text{font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;}
+.main{display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 61px);}
+.sidebar{border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.content{display:flex;flex-direction:column;overflow:hidden;}
+.s-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;padding:16px 16px 8px;}
+.s-block{padding:0 14px 14px;border-bottom:1px solid var(--border);}
+.field{margin-bottom:8px;}
+.field label{font-size:10px;color:var(--text2);display:block;margin-bottom:4px;font-family:'Space Mono',monospace;}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;color:var(--text);font-size:12px;font-family:'Space Mono',monospace;outline:none;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field input::placeholder{color:var(--text3);}
+.field select option{background:var(--surface2);}
+.exchange-selector{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.exch-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Space Mono',monospace;color:var(--text3);text-align:center;}
+.exch-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(200,241,53,.06);}
+.api-panel{display:none;} .api-panel.active{display:block;}
+.btn{width:100%;padding:8px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Space Grotesk',sans-serif;}
+.btn-accent{background:var(--accent);color:#0a0a0f;}
+.btn-accent:hover{background:var(--accent2);}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.asset-card{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+.asset-card:hover,.asset-card.active{border-color:var(--accent);background:rgba(200,241,53,.04);}
+.asset-info{display:flex;align-items:center;gap:8px;}
+.asset-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.asset-symbol{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;}
+.asset-name{font-size:10px;color:var(--text3);}
+.asset-price{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;}
+.asset-change{font-size:10px;font-family:'Space Mono',monospace;}
+.up{color:var(--up);} .down{color:var(--down);} .neutral{color:var(--text3);}
+.cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.cmd-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 5px;cursor:pointer;font-size:10px;font-family:'Space Mono',monospace;color:var(--text2);text-align:center;}
+.cmd-btn:hover{border-color:var(--accent);color:var(--accent);}
+.risk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:7px;}
+.risk-result{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px;text-align:center;}
+.risk-result-label{font-size:9px;color:var(--text3);margin-bottom:3px;font-family:'Space Mono',monospace;}
+.risk-result-val{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--accent);}
+/* ORDER PANEL */
+.order-panel{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
+.order-panel-title{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;font-family:'Space Mono',monospace;}
+.order-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.order-field label{font-size:9px;color:var(--text3);display:block;margin-bottom:3px;font-family:'Space Mono',monospace;}
+.order-field input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;font-family:'Space Mono',monospace;outline:none;}
+.order-field input:focus{border-color:var(--accent);}
+.lev-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.lev-row label{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;}
+.lev-row input[type=range]{flex:1;accent-color:var(--accent);}
+.lev-val{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--accent);min-width:36px;text-align:right;}
+/* ORDER TYPE SELECTOR */
+.order-type-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px;}
+.otype-btn{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:6px 4px;cursor:pointer;font-size:10px;font-weight:600;font-family:'Space Mono',monospace;color:var(--text3);text-align:center;transition:all .15s;}
+.otype-btn.active.market{border-color:var(--accent);color:var(--accent);background:rgba(200,241,53,.08);}
+.otype-btn.active.limit{border-color:#00aae4;color:#00aae4;background:rgba(0,170,228,.08);}
+.otype-btn.active.stop{border-color:var(--warn);color:var(--warn);background:rgba(251,191,36,.08);}
+.otype-btn:hover{border-color:var(--text2);}
+.order-type-info{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:8px;line-height:1.5;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.btn-long{background:rgba(74,222,128,.15);color:var(--up);border:1px solid rgba(74,222,128,.3);font-size:13px;padding:10px;}
+.btn-long:hover{background:rgba(74,222,128,.25);}
+.btn-short{background:rgba(248,113,113,.15);color:var(--down);border:1px solid rgba(248,113,113,.3);font-size:13px;padding:10px;}
+.btn-short:hover{background:rgba(248,113,113,.25);}
+.btn-close{background:rgba(251,191,36,.15);color:var(--warn);border:1px solid rgba(251,191,36,.3);font-size:12px;}
+.position-card{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;}
+.pos-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.pos-symbol{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;}
+.pos-side{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.pos-long{background:rgba(74,222,128,.15);color:var(--up);}
+.pos-short{background:rgba(248,113,113,.15);color:var(--down);}
+.pos-detail{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;line-height:1.6;}
+.pos-pnl{font-size:14px;font-weight:600;font-family:'Space Mono',monospace;margin-top:4px;}
+/* CHAT */
+.chat-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;}
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:14px;color:var(--text3);}
+.welcome-icon{width:56px;height:56px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.welcome h2{font-size:17px;color:var(--text2);font-weight:500;}
+.welcome p{font-size:12px;line-height:1.6;max-width:340px;}
+.welcome-cmds{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:6px;}
+.welcome-cmd{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;font-family:'Space Mono',monospace;color:var(--text2);cursor:pointer;}
+.welcome-cmd:hover{border-color:var(--accent);color:var(--accent);}
+.msg{display:flex;flex-direction:column;gap:4px;}
+.msg-user{align-items:flex-end;}
+.msg-ai{align-items:flex-start;}
+.msg-label{font-size:9px;color:var(--text3);font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;padding:0 4px;}
+.msg-bubble-user{background:var(--accent);color:#0a0a0f;border-radius:var(--radius) var(--radius) 4px var(--radius);font-weight:500;max-width:70%;padding:10px 14px;font-size:13px;}
+/* SIGNAL CARD - el gran cambio visual */
+.signal-card{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;font-family:'Space Grotesk',sans-serif;}
+.signal-header{padding:14px 18px;background:var(--surface2);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.signal-asset{font-size:16px;font-weight:700;font-family:'Space Mono',monospace;}
+.signal-price{font-size:14px;font-weight:600;font-family:'Space Mono',monospace;color:var(--accent);}
+.signal-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;font-family:'Space Mono',monospace;}
+.badge-long{background:rgba(74,222,128,.2);color:var(--up);border:1px solid rgba(74,222,128,.4);}
+.badge-short{background:rgba(248,113,113,.2);color:var(--down);border:1px solid rgba(248,113,113,.4);}
+.badge-wait{background:rgba(251,191,36,.2);color:var(--warn);border:1px solid rgba(251,191,36,.4);}
+.badge-neutral{background:var(--surface2);color:var(--text3);border:1px solid var(--border2);}
+.signal-body{padding:16px 18px;}
+.signal-section{margin-bottom:14px;}
+.signal-section-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;}
+.signal-row{display:flex;align-items:baseline;gap:8px;margin-bottom:5px;font-size:13px;}
+.signal-key{color:var(--text2);min-width:120px;flex-shrink:0;font-size:12px;}
+.signal-val{color:var(--text);font-weight:500;}
+.signal-val.up{color:var(--up);}
+.signal-val.down{color:var(--down);}
+.signal-val.warn{color:var(--warn);}
+.signal-val.accent{color:var(--accent);}
+.signal-levels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;}
+.level-box{background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;}
+.level-label{font-size:9px;color:var(--text3);font-family:'Space Mono',monospace;text-transform:uppercase;margin-bottom:4px;}
+.level-value{font-size:14px;font-weight:700;font-family:'Space Mono',monospace;}
+.level-sl{border:1px solid rgba(248,113,113,.3);}
+.level-sl .level-value{color:var(--down);}
+.level-tp1{border:1px solid rgba(74,222,128,.3);}
+.level-tp1 .level-value{color:var(--up);}
+.level-entry{border:1px solid rgba(200,241,53,.3);}
+.level-entry .level-value{color:var(--accent);}
+.signal-divider{border:none;border-top:1px solid var(--border2);margin:12px 0;}
+.confidence-bar{height:6px;background:var(--border2);border-radius:3px;overflow:hidden;margin-top:6px;}
+.confidence-fill{height:100%;border-radius:3px;transition:width .5s;}
+/* ORDER TYPE RECOMMENDATION */
+.order-rec{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 14px;margin-top:12px;border:1px solid var(--border2);}
+.order-rec-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;}
+.order-rec-type{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.order-rec-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;font-family:'Space Mono',monospace;}
+.rec-market{background:rgba(200,241,53,.15);color:var(--accent);border:1px solid rgba(200,241,53,.3);}
+.rec-limit{background:rgba(0,174,228,.15);color:#00aae4;border:1px solid rgba(0,174,228,.3);}
+.rec-stop{background:rgba(251,191,36,.15);color:var(--warn);border:1px solid rgba(251,191,36,.3);}
+.order-rec-reason{font-size:11px;color:var(--text2);line-height:1.5;}
+/* EXECUTE PANEL dentro del signal card */
+.signal-execute{padding:14px 18px;border-top:1px solid var(--border2);background:rgba(200,241,53,.02);}
+.signal-execute-title{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;font-family:'Space Mono',monospace;}
+.exec-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.exec-field label{font-size:9px;color:var(--text3);display:block;margin-bottom:3px;font-family:'Space Mono',monospace;}
+.exec-field input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 8px;color:var(--text);font-size:12px;font-family:'Space Mono',monospace;outline:none;}
+.exec-field input:focus{border-color:var(--accent);}
+.exec-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.exec-row label{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;}
+.exec-row input[type=range]{flex:1;accent-color:var(--accent);}
+.exec-lev-val{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--accent);min-width:36px;text-align:right;}
+.exec-type-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;}
+.exec-type-btn{padding:7px 4px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700;font-family:'Space Mono',monospace;text-align:center;border:1px solid var(--border2);background:var(--bg);color:var(--text3);transition:all .15s;}
+.exec-type-btn.sel-market{border-color:var(--accent);color:var(--accent);background:rgba(200,241,53,.08);}
+.exec-type-btn.sel-limit{border-color:#00aae4;color:#00aae4;background:rgba(0,170,228,.08);}
+.exec-type-btn.sel-stop{border-color:var(--warn);color:var(--warn);background:rgba(251,191,36,.08);}
+.exec-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.exec-btn-long{background:rgba(74,222,128,.15);color:var(--up);border:1px solid rgba(74,222,128,.4);padding:10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:700;}
+.exec-btn-long:hover{background:rgba(74,222,128,.25);}
+.exec-btn-short{background:rgba(248,113,113,.15);color:var(--down);border:1px solid rgba(248,113,113,.4);padding:10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:700;}
+.exec-btn-short:hover{background:rgba(248,113,113,.25);}
+/* Plain text fallback */
+.msg-plain{background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:4px var(--radius) var(--radius) var(--radius);width:100%;max-width:100%;white-space:pre-wrap;padding:12px 14px;font-size:13px;line-height:1.7;}
+.order-confirm{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 16px;width:100%;}
+.order-confirm.success{border-color:rgba(74,222,128,.4);}
+.order-confirm.error{border-color:rgba(248,113,113,.4);}
+.order-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin-top:8px;}
+.order-detail{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
+.order-detail span{color:var(--text);}
+.loading-msg{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:13px;padding:4px 0;}
+.spinner{width:15px;height:15px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.input-area{border-top:1px solid var(--border);padding:14px 20px;background:var(--bg);}
+.input-row{display:flex;gap:8px;align-items:center;}
+.input-wrap{flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);display:flex;align-items:center;padding:0 14px;}
+.input-wrap:focus-within{border-color:var(--accent);}
+.input-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;padding:12px 0;}
+.input-wrap input::placeholder{color:var(--text3);}
+.send-btn{width:42px;height:42px;background:var(--accent);border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.send-btn:hover{background:var(--accent2);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;}
+.send-btn svg{width:16px;height:16px;fill:#0a0a0f;}
+.input-hint{font-size:10px;color:var(--text3);margin-top:6px;font-family:'Space Mono',monospace;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 14px;font-size:12px;color:var(--text);z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{border-color:var(--up);color:var(--up);}
+.toast.error{border-color:var(--down);color:var(--down);}
+.toast.warn{border-color:var(--warn);color:var(--warn);}
+.tabs{display:flex;border-bottom:1px solid var(--border);padding:0 14px;}
+.tab{font-size:11px;padding:10px 12px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;font-family:'Space Mono',monospace;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+.info-box{background:rgba(200,241,53,.05);border:1px solid rgba(200,241,53,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;line-height:1.6;margin-top:6px;}
+.exch-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:'Space Mono',monospace;padding:3px 8px;border-radius:20px;}
+.exch-badge.bitunix{background:rgba(200,241,53,.1);color:var(--accent);border:1px solid rgba(200,241,53,.2);}
+.exch-badge.bitmart{background:rgba(0,174,228,.1);color:#00aae4;border:1px solid rgba(0,174,228,.2);}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">CM</div>
+    <div>
+      <div class="logo-text">CryptoMike Trader</div>
+      <div class="logo-sub">uso personal · powered by Claude</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="exchBadge" class="exch-badge" style="display:none"></div>
+    <div><span class="status-dot" id="statusDot"></span><span class="status-text" id="statusText">sin conectar</span></div>
+  </div>
+</header>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="s-label">Configuracion</div>
+    <div class="s-block">
+      <div class="field"><label>ANTHROPIC API KEY</label><input type="password" id="anthropicKey" placeholder="sk-ant-..." /></div>
+      <div class="field">
+        <label>Exchange</label>
+        <div class="exchange-selector">
+          <div class="exch-btn active" id="btnBitunix" onclick="selectExchange('bitunix')">Bitunix</div>
+          <div class="exch-btn" id="btnBitmart" onclick="selectExchange('bitmart')">BitMart</div>
+        </div>
+      </div>
+      <div class="api-panel active" id="panel-bitunix">
+        <div class="field"><label>BITUNIX API KEY</label><input type="password" id="bitunixKey" placeholder="api key..." /></div>
+        <div class="field"><label>BITUNIX SECRET KEY</label><input type="password" id="bitunixSecret" placeholder="secret key..." /></div>
+        <div class="info-box">Permisos: Trading SI · Retiro NO</div>
+      </div>
+      <div class="api-panel" id="panel-bitmart">
+        <div class="field"><label>BITMART API KEY</label><input type="password" id="bitmartKey" placeholder="api key..." /></div>
+        <div class="field"><label>BITMART SECRET KEY</label><input type="password" id="bitmartSecret" placeholder="secret key..." /></div>
+        <div class="field"><label>MEMO (si aplica)</label><input type="text" id="bitmartMemo" placeholder="memo..." /></div>
+        <div class="info-box">Permisos: Trade SI · Withdraw NO</div>
+      </div>
+      <div class="field" style="margin-top:8px;"><label>RIESGO POR OPERACION (%)</label><input type="number" id="riskPct" value="2" min="0.5" max="10" step="0.5" /></div>
+      <button class="btn btn-accent" onclick="conectar()">Conectar</button>
+    </div>
+
+    <div class="s-label">Activos en vivo</div>
+    <div class="s-block">
+      <div class="asset-card" id="card-XLM" onclick="seleccionarActivo('XLM')">
+        <div class="asset-info"><div class="asset-dot" style="background:#7b68ee"></div><div><div class="asset-symbol">XLM</div><div class="asset-name">Stellar Lumens</div></div></div>
+        <div style="text-align:right"><div class="asset-price neutral" id="price-XLM">--</div><div class="asset-change neutral" id="change-XLM">--</div></div>
+      </div>
+      <div class="asset-card" id="card-XRP" onclick="seleccionarActivo('XRP')">
+        <div class="asset-info"><div class="asset-dot" style="background:#00aae4"></div><div><div class="asset-symbol">XRP</div><div class="asset-name">Ripple</div></div></div>
+        <div style="text-align:right"><div class="asset-price neutral" id="price-XRP">--</div><div class="asset-change neutral" id="change-XRP">--</div></div>
+      </div>
+      <div class="asset-card" id="card-HBAR" onclick="seleccionarActivo('HBAR')">
+        <div class="asset-info"><div class="asset-dot" style="background:#8a8aff"></div><div><div class="asset-symbol">HBAR</div><div class="asset-name">Hedera</div></div></div>
+        <div style="text-align:right"><div class="asset-price neutral" id="price-HBAR">--</div><div class="asset-change neutral" id="change-HBAR">--</div></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="sideTab(this,'tab-analisis')">Analisis</div>
+      <div class="tab" onclick="sideTab(this,'tab-posiciones')">Posiciones</div>
+      <div class="tab" onclick="sideTab(this,'tab-calc')">Riesgo</div>
+    </div>
+
+    <div id="tab-analisis" class="tab-panel active">
+      <div class="s-label">Comandos rapidos</div>
+      <div class="s-block">
+        <div class="cmd-grid">
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
+          <div class="cmd-btn" onclick="sendCmd('SETUP XLM')">SETUP XLM</div>
+          <div class="cmd-btn" onclick="sendCmd('SETUP XRP')">SETUP XRP</div>
+          <div class="cmd-btn" onclick="sendCmd('SETUP HBAR')">SETUP HBAR</div>
+          <div class="cmd-btn" onclick="sendCmd('COMPARAR XLM XRP')">XLM vs XRP</div>
+          <div class="cmd-btn" onclick="sendCmd('COMPARAR XLM HBAR')">XLM vs HBAR</div>
+          <div class="cmd-btn" onclick="sendCmd('NOTICIAS XLM')">NOTICIAS XLM</div>
+          <div class="cmd-btn" onclick="sendCmd('NOTICIAS XRP')">NOTICIAS XRP</div>
+          <div class="cmd-btn" onclick="sendCmd('FUNDAMENTAL XLM')">FUND. XLM</div>
+          <div class="cmd-btn" onclick="sendCmd('FUNDAMENTAL HBAR')">FUND. HBAR</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-posiciones" class="tab-panel">
+      <div class="s-label">Posiciones abiertas</div>
+      <div class="s-block" id="posicionesContainer">
+        <div style="font-size:12px;color:var(--text3);text-align:center;padding:20px 0;font-family:'Space Mono',monospace;">Sin posiciones abiertas</div>
+      </div>
+    </div>
+
+    <div id="tab-calc" class="tab-panel">
+      <div class="s-label">Calculadora riesgo</div>
+      <div class="s-block">
+        <div class="risk-grid">
+          <div class="field" style="margin:0"><label>Capital $</label><input type="number" id="rCapital" placeholder="1000" style="font-size:11px;padding:6px 7px" /></div>
+          <div class="field" style="margin:0"><label>Entrada $</label><input type="number" id="rEntrada" placeholder="0.202" step="0.0001" style="font-size:11px;padding:6px 7px" /></div>
+          <div class="field" style="margin:0"><label>Stop $</label><input type="number" id="rStop" placeholder="0.195" step="0.0001" style="font-size:11px;padding:6px 7px" /></div>
+        </div>
+        <button class="btn btn-ghost" style="margin-bottom:8px" onclick="calcularRiesgo()">Calcular</button>
+        <div id="riskResults" style="display:none">
+          <div class="risk-grid">
+            <div class="risk-result"><div class="risk-result-label">USDT riesgo</div><div class="risk-result-val" id="rUSDT">--</div></div>
+            <div class="risk-result"><div class="risk-result-label">Unidades</div><div class="risk-result-val" id="rUnidades">--</div></div>
+            <div class="risk-result"><div class="risk-result-label">Stop %</div><div class="risk-result-val" id="rStopPct">--</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="chat-area" id="chatArea">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">⚡</div>
+        <h2>CryptoMike Personal Trader</h2>
+        <p>Analiza con Claude, recibe senales estructuradas con niveles exactos y ejecuta ordenes a mercado, limite o stop directamente desde aqui.</p>
+        <div class="welcome-cmds">
+          <div class="welcome-cmd" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
+          <div class="welcome-cmd" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
+          <div class="welcome-cmd" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
+          <div class="welcome-cmd" onclick="sendCmd('SETUP XLM')">SETUP XLM</div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <div class="input-wrap">
+          <input type="text" id="userInput" placeholder="Escribe un comando o pregunta libre..." onkeydown="if(event.key==='Enter')enviar()" />
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="enviar()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">ANALIZA · SETUP · COMPARAR · FUNDAMENTAL · NOTICIAS · RIESGO [capital] [entrada] [stop]</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var RENDER_SERVER = 'https://cryptomike-server.onrender.com';
+var conversationHistory = [];
+var prices = { XLM: null, XRP: null, HBAR: null };
+var priceInterval = null;
+var activeExchange = 'bitunix';
+var loadingEl = null;
+
+// ═══ EXCHANGE ═══
+function selectExchange(ex) {
+  activeExchange = ex;
+  ['bitunix','bitmart'].forEach(function(e) {
+    document.getElementById('btn' + e.charAt(0).toUpperCase() + e.slice(1)).classList.toggle('active', e === ex);
+    document.getElementById('panel-' + e).classList.toggle('active', e === ex);
+  });
+}
+
+function sideTab(el, panelId) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ═══ CONEXION ═══
+function conectar() {
+  var ak = document.getElementById('anthropicKey').value.trim();
+  if (!ak) { showToast('Introduce tu Anthropic API Key', 'error'); return; }
+  document.getElementById('statusDot').classList.add('live');
+  document.getElementById('statusText').textContent = 'conectado · precios en vivo';
+  var badge = document.getElementById('exchBadge');
+  badge.style.display = 'inline-flex';
+  badge.className = 'exch-badge ' + activeExchange;
+  badge.textContent = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
+  showToast('Conectado', 'success');
+  fetchPrices();
+  if (priceInterval) clearInterval(priceInterval);
+  priceInterval = setInterval(fetchPrices, 15000);
+  fetchPositions();
+  setInterval(fetchPositions, 30000);
+}
+
+// ═══ PRECIOS ═══
+function fetchPrices() {
+  var syms = { XLM: 'XLMUSDT', XRP: 'XRPUSDT', HBAR: 'HBARUSDT' };
+  Object.keys(syms).forEach(function(sym) {
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=' + syms[sym])
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        prices[sym] = parseFloat(d.lastPrice);
+        var ch = parseFloat(d.priceChangePercent);
+        var pe = document.getElementById('price-' + sym);
+        var ce = document.getElementById('change-' + sym);
+        if (pe) {
+          pe.textContent = '$' + prices[sym].toFixed(4);
+          pe.className = 'asset-price ' + (ch >= 0 ? 'up' : 'down');
+          ce.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(2) + '%';
+          ce.className = 'asset-change ' + (ch >= 0 ? 'up' : 'down');
+        }
+      }).catch(function() {});
+  });
+}
+
+function seleccionarActivo(sym) {
+  document.querySelectorAll('.asset-card').forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('card-' + sym).classList.add('active');
+  var precio = prices[sym] ? '$' + prices[sym].toFixed(4) : '';
+  sendCmd('ANALIZA ' + sym + (precio ? ' ' + precio : ''));
+}
+
+// ═══ SERVER REQUESTS ═══
+function srvReq(url, body) {
+  return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then(function(r) { return r.json(); }).catch(function(e) { showToast('Error red: ' + e.message, 'error'); return null; });
+}
+function bitunixReq(ep, body) {
+  var apiKey = document.getElementById('bitunixKey').value.trim();
+  var secret = document.getElementById('bitunixSecret').value.trim();
+  if (!apiKey || !secret) { showToast('Introduce Bitunix API Key y Secret', 'error'); return Promise.resolve(null); }
+  body.apiKey = apiKey; body.secret = secret;
+  return srvReq(RENDER_SERVER + '/bitunix/' + ep, body);
+}
+function bitmartReq(ep, body) {
+  var apiKey = document.getElementById('bitmartKey').value.trim();
+  var secret = document.getElementById('bitmartSecret').value.trim();
+  var memo = document.getElementById('bitmartMemo').value.trim() || '';
+  if (!apiKey || !secret) { showToast('Introduce BitMart API Key y Secret', 'error'); return Promise.resolve(null); }
+  body.apiKey = apiKey; body.secret = secret; body.memo = memo;
+  return srvReq(RENDER_SERVER + '/' + ep, body);
+}
+
+// ═══ EJECUTAR ORDEN (desde signal card) ═══
+function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
+  var usdt = parseFloat(document.getElementById('exec-usdt-' + sym).value);
+  var entradaFinal = parseFloat(document.getElementById('exec-entry-' + sym).value) || entrada;
+  var slFinal = parseFloat(document.getElementById('exec-sl-' + sym).value) || sl;
+  var tpFinal = parseFloat(document.getElementById('exec-tp-' + sym).value) || tp;
+  var lev = parseInt(document.getElementById('exec-lev-' + sym).value) || leverage;
+
+  if (!usdt || usdt <= 0) { showToast('Introduce la cantidad en USDT', 'error'); return; }
+  if (!slFinal) { showToast('Introduce el Stop Loss', 'error'); return; }
+  if (!tpFinal) { showToast('Introduce el Take Profit', 'error'); return; }
+
+  var precio = prices[sym] || entradaFinal;
+  if (!precio) { showToast('Precio no disponible', 'error'); return; }
+
+  // orderType: 'market', 'limit', 'stop'
+  var ot = document.querySelector('.exec-type-btn.sel-market, .exec-type-btn.sel-limit, .exec-type-btn.sel-stop');
+  if (ot) {
+    if (ot.classList.contains('sel-market')) orderType = 'market';
+    else if (ot.classList.contains('sel-limit')) orderType = 'limit';
+    else orderType = 'stop';
+  }
+
+  // Para ordenes pendientes usamos el precio de entrada del analisis
+  // market = precio actual, limit/stop = precio de entrada del analisis
+  var precioEjecucion = orderType === 'market' ? precio : entradaFinal;
+
+  if (activeExchange === 'bitunix') {
+    var qty = Math.floor(usdt * lev / precioEjecucion);
+    if (qty <= 0) { showToast('Cantidad muy pequena', 'error'); return; }
+    bitunixReq('leverage', { symbol: sym + 'USDT', leverage: lev }).then(function() {
+      showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
+      // Bitunix soporta limit orders ademas de market
+      var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
+      if (orderType === 'limit' || orderType === 'stop') {
+        orderBody.orderType = orderType === 'limit' ? 'LIMIT' : 'STOP';
+        orderBody.price = entradaFinal;
+      }
+      return bitunixReq('order', orderBody);
+    }).then(function(res) {
+      mostrarResultadoOrden(res && res.code === 0, side, sym, usdt, precioEjecucion, slFinal, tpFinal, lev, orderType, res ? res.msg : 'Error');
+      fetchPositions();
+    });
+  } else {
+    var size = Math.floor(usdt * lev / precioEjecucion);
+    bitmartReq('leverage', { symbol: sym + '_USDT', leverage: lev, openType: 'isolated' }).then(function() {
+      showToast('Enviando orden ' + orderType + ' a BitMart...', '');
+      return bitmartReq('order', { symbol: sym + '_USDT', side: side, size: size, sl: slFinal, tp: tpFinal });
+    }).then(function(res) {
+      mostrarResultadoOrden(res && res.code === 1000, side, sym, usdt, precioEjecucion, slFinal, tpFinal, lev, orderType, res ? res.message : 'Error');
+      fetchPositions();
+    });
+  }
+}
+
+function setExecOrderType(sym, type) {
+  var btns = document.querySelectorAll('#exec-types-' + sym + ' .exec-type-btn');
+  btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit','sel-stop'); });
+  var btn = document.getElementById('exec-' + type + '-' + sym);
+  if (btn) btn.classList.add('sel-' + type);
+  // Actualizar info del tipo
+  var info = document.getElementById('exec-typeinfo-' + sym);
+  if (info) {
+    var msgs = {
+      market: 'Entra ahora al precio de mercado. Usa cuando quieres entrar inmediatamente.',
+      limit: 'Orden pendiente al precio de entrada del analisis. Se ejecuta si el precio llega a ese nivel.',
+      stop: 'Orden en ruptura. Se activa cuando el precio rompe el nivel de entrada (util para BOS).'
+    };
+    info.textContent = msgs[type] || '';
+  }
+}
+
+function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderType, errMsg) {
+  ocultarWelcome();
+  var exchName = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
+  var otLabel = { market: 'MERCADO', limit: 'LIMITE', stop: 'STOP' };
+  var div = document.createElement('div');
+  div.className = 'msg msg-ai';
+  if (ok) {
+    div.innerHTML = '<div class="msg-label">ORDEN ENVIADA</div><div class="order-confirm success">' +
+      '<div style="font-size:13px;font-weight:600;color:var(--up);margin-bottom:8px;">OK ' + side + ' ' + sym + ' (' + (otLabel[orderType] || orderType.toUpperCase()) + ') en ' + exchName + '</div>' +
+      '<div class="order-detail-grid">' +
+      '<div class="order-detail">Activo: <span>' + sym + 'USDT</span></div>' +
+      '<div class="order-detail">Tipo: <span>' + (otLabel[orderType] || orderType) + '</span></div>' +
+      '<div class="order-detail">Capital: <span>$' + usdt + '</span></div>' +
+      '<div class="order-detail">Apal: <span>' + lev + 'x</span></div>' +
+      '<div class="order-detail">Precio: <span>~$' + precio.toFixed(4) + '</span></div>' +
+      '<div class="order-detail">Exchange: <span>' + exchName + '</span></div>' +
+      '<div class="order-detail">SL: <span style="color:var(--down)">$' + sl + '</span></div>' +
+      '<div class="order-detail">TP: <span style="color:var(--up)">$' + tp + '</span></div>' +
+      '</div></div>';
+    showToast('Orden ' + (otLabel[orderType] || orderType) + ' enviada', 'success');
+  } else {
+    div.innerHTML = '<div class="msg-label">ERROR</div><div class="order-confirm error">' +
+      '<div style="font-size:13px;font-weight:600;color:var(--down);">Error en ' + exchName + '</div>' +
+      '<div style="font-size:12px;color:var(--text2);margin-top:6px;">' + (errMsg || 'desconocido') + '</div></div>';
+    showToast('Error: ' + (errMsg || 'desconocido'), 'error');
+  }
+  document.getElementById('chatArea').appendChild(div);
+  document.getElementById('chatArea').scrollTop = 99999;
+}
+
+// ═══ POSICIONES ═══
+function fetchPositions() {
+  var apiKey = activeExchange === 'bitunix' ? document.getElementById('bitunixKey').value.trim() : document.getElementById('bitmartKey').value.trim();
+  if (!apiKey) return;
+  var p = activeExchange === 'bitunix' ? bitunixReq('positions', {}) : bitmartReq('positions', {});
+  p.then(function(res) {
+    var positions = [];
+    if (activeExchange === 'bitunix' && res && res.code === 0 && res.data && res.data.length) {
+      positions = res.data.map(function(p) {
+        return { symbol: p.symbol, side: p.side === 'LONG' ? 'LONG' : 'SHORT', entry: parseFloat(p.avgOpenPrice || 0), qty: p.qty, liq: parseFloat(p.liqPrice || 0), lev: p.leverage, pnl: parseFloat(p.unrealizedPNL || 0) };
+      });
+    } else if (activeExchange === 'bitmart' && res && res.code === 1000 && res.data && res.data.length) {
+      positions = res.data.map(function(p) {
+        return { symbol: p.symbol, side: p.position_type === 1 ? 'LONG' : 'SHORT', entry: parseFloat(p.avg_price || 0), qty: p.current_amount, liq: parseFloat(p.liquidation_price || 0), lev: p.leverage, pnl: parseFloat(p.unrealized_value || 0) };
+      });
+    }
+    var container = document.getElementById('posicionesContainer');
+    if (!positions.length) {
+      container.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:20px 0;">Sin posiciones abiertas</div>';
+    } else {
+      container.innerHTML = positions.map(function(p) {
+        return '<div class="position-card"><div class="pos-header"><div class="pos-symbol">' + p.symbol + '</div><div class="pos-side ' + (p.side === 'LONG' ? 'pos-long' : 'pos-short') + '">' + p.side + '</div></div>' +
+          '<div class="pos-detail">Entrada: $' + p.entry.toFixed(4) + ' · Qty: ' + p.qty + '<br>Liq: $' + p.liq.toFixed(4) + ' · Lev: ' + p.lev + 'x</div>' +
+          '<div class="pos-pnl ' + (p.pnl >= 0 ? 'up' : 'down') + '">' + (p.pnl >= 0 ? '+' : '') + '$' + p.pnl.toFixed(2) + ' USDT</div></div>';
+      }).join('');
+    }
+  }).catch(function() {});
+}
+
+// ═══ CLAUDE + PARSEO DE SENAL ═══
+function sendCmd(cmd) {
+  var parts = cmd.split(' ');
+  if ((parts[0] === 'ANALIZA' || parts[0] === 'SETUP') && parts.length === 2 && prices[parts[1]]) {
+    cmd = parts[0] + ' ' + parts[1] + ' $' + prices[parts[1]].toFixed(4);
+  }
+  enviarMensaje(cmd);
+}
+
+function enviar() {
+  var input = document.getElementById('userInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  enviarMensaje(msg);
+}
+
+// Extrae datos estructurados de la respuesta de Claude
+function parsearSenal(text) {
+  var data = {
+    asset: null, price: null, direction: null, confidence: null,
+    entry: null, sl: null, tp1: null, tp2: null, tp3: null,
+    action: null, orderType: null, orderReason: null,
+    ratioTp1: null, structure: null, sesgo: null
+  };
+
+  // Asset y precio
+  var m = text.match(/ANALISIS\s+([A-Z]+)[\s\/].*?\$([\d.]+)/i) ||
+           text.match(/([A-Z]{3,4})\s*[|/]\s*\$([\d.]+)/);
+  if (m) { data.asset = m[1]; data.price = parseFloat(m[2]); }
+  if (!data.asset) {
+    var am = text.match(/\b(XLM|XRP|HBAR)\b/);
+    if (am) data.asset = am[1];
+  }
+
+  // Direccion
+  if (/direccion[:\s]+LONG/i.test(text) || /\bLONG\b/.test(text)) data.direction = 'LONG';
+  else if (/direccion[:\s]+SHORT/i.test(text) || /\bSHORT\b/.test(text)) data.direction = 'SHORT';
+
+  // Accion
+  if (/accion[:\s]+COMPRAR/i.test(text) || /\bCOMPRAR\b/.test(text)) data.action = 'COMPRAR';
+  else if (/accion[:\s]+VENDER/i.test(text) || /\bVENDER\b/.test(text)) data.action = 'VENDER';
+  else if (/accion[:\s]+ESPERAR/i.test(text) || /\bESPERAR\b/.test(text)) data.action = 'ESPERAR';
+
+  // Confianza
+  var confM = text.match(/[Cc]onfianza[:\s]+([\d]+)\s*\/\s*10/);
+  if (confM) data.confidence = parseInt(confM[1]);
+
+  // Niveles
+  var entM = text.match(/[Zz]ona\s+[Ee]ntrada[:\s]+\$?([\d.]+)/);
+  if (!entM) entM = text.match(/[Ee]ntrada[:\s]+\$([\d.]+)/);
+  if (entM) data.entry = parseFloat(entM[1]);
+
+  var slM = text.match(/Stop Loss[:\s]+\$?([\d.]+)/i);
+  if (slM) data.sl = parseFloat(slM[1]);
+
+  var tp1M = text.match(/TP1[:\s]+\$?([\d.]+)/i);
+  if (tp1M) data.tp1 = parseFloat(tp1M[1]);
+  var tp2M = text.match(/TP2[:\s]+\$?([\d.]+)/i);
+  if (tp2M) data.tp2 = parseFloat(tp2M[1]);
+  var tp3M = text.match(/TP3[:\s]+\$?([\d.]+)/i);
+  if (tp3M) data.tp3 = parseFloat(tp3M[1]);
+
+  // Ratio
+  var ratM = text.match(/TP1[\s\S]*?ratio\s+([\d.]+)\s*:\s*1/i);
+  if (ratM) data.ratioTp1 = parseFloat(ratM[1]);
+
+  // Estructura
+  var strM = text.match(/[Ee]structura[:\s]+(ALCISTA|BAJISTA|RANGO)/i);
+  if (strM) data.structure = strM[1].toUpperCase();
+
+  // Sesgo fundamental
+  var sesM = text.match(/[Ss]esgo\s+(?:fundamental)?[:\s]+(ALCISTA|BAJISTA|NEUTRAL)/i);
+  if (sesM) data.sesgo = sesM[1].toUpperCase();
+
+  // Tipo de orden recomendado
+  // Si menciona CHoCH confirmacion, BOS, ruptura -> stop order
+  // Si menciona retest, pullback, orden bloque -> limit
+  // Si dice setup valido SI o precio en zona -> market
+  if (/BOS|ruptura|breakout/i.test(text)) {
+    data.orderType = 'stop';
+    data.orderReason = 'El analisis detecta una ruptura de estructura (BOS). Orden STOP se activa cuando el precio confirma la ruptura.';
+  } else if (/retest|pullback|orden bloque|order block|retroceso/i.test(text)) {
+    data.orderType = 'limit';
+    data.orderReason = 'El analisis espera un retroceso a zona de interes. Orden LIMITE al precio de entrada para capturar el retest.';
+  } else if (/setup valido[:\s]+SI|precio.*zona/i.test(text)) {
+    data.orderType = 'market';
+    data.orderReason = 'Setup valido activo. El precio esta en zona de entrada. Orden a MERCADO recomendada.';
+  } else if (data.action === 'ESPERAR' || (data.confidence && data.confidence < 6)) {
+    data.orderType = null;
+    data.orderReason = 'No hay setup claro. Espera confirmacion antes de entrar.';
+  } else {
+    data.orderType = 'limit';
+    data.orderReason = 'Sin ruptura activa detectada. Orden LIMITE al nivel de entrada del analisis.';
+  }
+
+  return data;
+}
+
+// Construye la tarjeta visual de senal
+function buildSignalCard(text, senal) {
+  if (!senal.asset && !senal.sl && !senal.tp1) return null; // no hay datos suficientes
+
+  var sym = senal.asset || '???';
+  var precioActual = prices[sym] ? prices[sym] : senal.price;
+  var confPct = senal.confidence ? (senal.confidence * 10) : 0;
+  var confColor = confPct >= 70 ? 'var(--up)' : confPct >= 50 ? 'var(--warn)' : 'var(--down)';
+
+  // Badge de direccion
+  var badgeClass = 'badge-neutral';
+  var badgeText = senal.action || 'ANALISIS';
+  if (senal.action === 'COMPRAR' && senal.direction === 'LONG') { badgeClass = 'badge-long'; badgeText = 'LONG'; }
+  else if (senal.action === 'VENDER' && senal.direction === 'SHORT') { badgeClass = 'badge-short'; badgeText = 'SHORT'; }
+  else if (senal.action === 'ESPERAR') { badgeClass = 'badge-wait'; badgeText = 'ESPERAR'; }
+
+  // Tipo de orden badge
+  var orderBadgeHtml = '';
+  var orderTypeSelected = senal.orderType || 'limit';
+  if (senal.orderType) {
+    var obClass = { market: 'rec-market', limit: 'rec-limit', stop: 'rec-stop' }[senal.orderType] || 'rec-limit';
+    var obLabel = { market: 'MERCADO', limit: 'LIMITE', stop: 'STOP' }[senal.orderType] || 'LIMITE';
+    orderBadgeHtml = '<div class="order-rec">' +
+      '<div class="order-rec-title">Tipo de orden recomendado</div>' +
+      '<div class="order-rec-type"><span class="order-rec-badge ' + obClass + '">' + obLabel + '</span></div>' +
+      '<div class="order-rec-reason">' + (senal.orderReason || '') + '</div>' +
+      '</div>';
+  }
+
+  // Niveles
+  var entradaVal = senal.entry ? '$' + senal.entry.toFixed(4) : (precioActual ? '$' + precioActual.toFixed(4) : '--');
+  var slVal = senal.sl ? '$' + senal.sl.toFixed(4) : '--';
+  var tp1Val = senal.tp1 ? '$' + senal.tp1.toFixed(4) : '--';
+  var tp2Val = senal.tp2 ? '$' + senal.tp2.toFixed(4) : '';
+  var tp3Val = senal.tp3 ? '$' + senal.tp3.toFixed(4) : '';
+
+  var riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
+  var capital = 100; // placeholder para mostrar calculo
+  var execEntry = senal.entry || (precioActual || 0);
+  var execSL = senal.sl || 0;
+
+  // Panel de ejecucion
+  var execPanel = '';
+  if (senal.direction && (senal.sl || senal.tp1)) {
+    var defOT = orderTypeSelected;
+    execPanel = '<div class="signal-execute">' +
+      '<div class="signal-execute-title">Ejecutar operativa</div>' +
+      '<div class="exec-grid">' +
+        '<div class="exec-field"><label>USDT</label><input type="number" id="exec-usdt-' + sym + '" placeholder="20" /></div>' +
+        '<div class="exec-field"><label>ENTRADA $</label><input type="number" id="exec-entry-' + sym + '" value="' + (execEntry > 0 ? execEntry.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>APAL.</label><input type="number" id="exec-lev-' + sym + '" value="10" min="1" max="100" /></div>' +
+        '<div class="exec-field"><label>SL $</label><input type="number" id="exec-sl-' + sym + '" value="' + (execSL > 0 ? execSL.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>TP $</label><input type="number" id="exec-tp-' + sym + '" value="' + (senal.tp1 ? senal.tp1.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>USDT riesgo</label><input type="text" id="exec-risk-' + sym + '" value="--" readonly style="color:var(--text3)" /></div>' +
+      '</div>' +
+      '<div class="exec-type-row" id="exec-types-' + sym + '">' +
+        '<div class="exec-type-btn ' + (defOT === 'market' ? 'sel-market' : '') + '" id="exec-market-' + sym + '" onclick="setExecOrderType('' + sym + '','market')">MERCADO</div>' +
+        '<div class="exec-type-btn ' + (defOT === 'limit' ? 'sel-limit' : '') + '" id="exec-limit-' + sym + '" onclick="setExecOrderType('' + sym + '','limit')">LIMITE</div>' +
+        '<div class="exec-type-btn ' + (defOT === 'stop' ? 'sel-stop' : '') + '" id="exec-stop-' + sym + '" onclick="setExecOrderType('' + sym + '','stop')">STOP</div>' +
+      '</div>' +
+      '<div id="exec-typeinfo-' + sym + '" style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;margin-bottom:10px;line-height:1.5;"></div>' +
+      '<div class="exec-btns">' +
+        '<button class="exec-btn-long" onclick="ejecutarDesdeCard('' + sym + '','LONG',' + (execEntry||0) + ',' + (execSL||0) + ',' + (senal.tp1||0) + ',10,'' + defOT + '')">▲ LONG</button>' +
+        '<button class="exec-btn-short" onclick="ejecutarDesdeCard('' + sym + '','SHORT',' + (execEntry||0) + ',' + (execSL||0) + ',' + (senal.tp1||0) + ',10,'' + defOT + '')">▼ SHORT</button>' +
+      '</div>' +
+    '</div>';
+    // Inicializar info del tipo seleccionado
+    setTimeout(function() { setExecOrderType(sym, defOT); }, 100);
+  }
+
+  var html = '<div class="signal-card">' +
+    '<div class="signal-header">' +
+      '<span class="signal-asset">' + sym + '/USDT</span>' +
+      (precioActual ? '<span class="signal-price">$' + precioActual.toFixed(4) + '</span>' : '') +
+      '<span class="signal-badge ' + badgeClass + '">' + badgeText + '</span>' +
+    '</div>' +
+    '<div class="signal-body">';
+
+  // Niveles principales
+  if (senal.sl || senal.tp1 || senal.entry) {
+    html += '<div class="signal-section"><div class="signal-section-title">Niveles clave</div>';
+    html += '<div class="signal-levels">';
+    html += '<div class="level-box level-entry"><div class="level-label">Entrada</div><div class="level-value">' + entradaVal + '</div></div>';
+    html += '<div class="level-box level-sl"><div class="level-label">Stop Loss</div><div class="level-value">' + slVal + '</div></div>';
+    html += '<div class="level-box level-tp1"><div class="level-label">TP1' + (senal.ratioTp1 ? ' ' + senal.ratioTp1 + ':1' : '') + '</div><div class="level-value">' + tp1Val + '</div></div>';
+    html += '</div>';
+    if (tp2Val || tp3Val) {
+      html += '<div style="display:flex;gap:8px;margin-top:8px;">';
+      if (tp2Val) html += '<div style="flex:1;background:var(--surface2);border-radius:6px;padding:6px 8px;text-align:center;font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;">TP2 <span style="color:var(--up);font-weight:600">' + tp2Val + '</span></div>';
+      if (tp3Val) html += '<div style="flex:1;background:var(--surface2);border-radius:6px;padding:6px 8px;text-align:center;font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;">TP3 <span style="color:var(--up);font-weight:600">' + tp3Val + '</span></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // Info de sesgo y estructura
+  if (senal.structure || senal.sesgo) {
+    html += '<hr class="signal-divider">';
+    html += '<div class="signal-section">';
+    if (senal.structure) html += '<div class="signal-row"><span class="signal-key">Estructura</span><span class="signal-val ' + (senal.structure === 'ALCISTA' ? 'up' : senal.structure === 'BAJISTA' ? 'down' : 'warn') + '">' + senal.structure + '</span></div>';
+    if (senal.sesgo) html += '<div class="signal-row"><span class="signal-key">Sesgo fundamental</span><span class="signal-val ' + (senal.sesgo === 'ALCISTA' ? 'up' : senal.sesgo === 'BAJISTA' ? 'down' : 'neutral') + '">' + senal.sesgo + '</span></div>';
+    html += '</div>';
+  }
+
+  // Confianza
+  if (senal.confidence) {
+    html += '<hr class="signal-divider">';
+    html += '<div class="signal-section"><div class="signal-row"><span class="signal-key">Confianza</span><span class="signal-val" style="color:' + confColor + '">' + senal.confidence + '/10</span></div>';
+    html += '<div class="confidence-bar"><div class="confidence-fill" style="width:' + confPct + '%;background:' + confColor + '"></div></div></div>';
+  }
+
+  // Recomendacion tipo orden
+  if (orderBadgeHtml) {
+    html += '<hr class="signal-divider">' + orderBadgeHtml;
+  }
+
+  html += '</div>'; // cierra signal-body
+
+  // Panel ejecutar
+  html += execPanel;
+
+  html += '</div>'; // cierra signal-card
+  return html;
+}
+
+// ═══ ENVIAR MENSAJE ═══
+function enviarMensaje(msg) {
+  var ak = document.getElementById('anthropicKey').value.trim();
+  if (!ak) { showToast('Introduce tu Anthropic API Key primero', 'error'); return; }
+  ocultarWelcome();
+  agregarMensaje('user', msg);
+  setLoading(true);
+  conversationHistory.push({ role: 'user', content: msg });
+
+  var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Activos: XLM, XRP, HBAR en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Ratio minimo 1:3. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nCATALIZADORES: XLM=DTCC 2027 ONU MoneyGram Franklin Templeton 569M RWA CME futuros ISO 20022. XRP=ETF spot 1.2B CLARITY Act SEC resuelto. HBAR=ETF Canary Nasdaq 549M OKCoin Japan Bank of England DLT.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / SIN POSICION\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE / STOP\n- Razon: [explicacion breve de por que ese tipo de orden segun el contexto tecnico]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.\n\nCOMANDOS: SETUP=solo setup y tipo de orden | FUNDAMENTAL=solo fundamental | NOTICIAS=5 catalizadores con impacto | COMPARAR=tabla+veredicto | RIESGO [capital] [entrada] [stop]=calculo posicion';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': ak, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 2500, system: sp, messages: conversationHistory })
+  }).then(function(r) {
+    if (!r.ok) return r.json().then(function(e) { throw new Error(e.error ? e.error.message : 'Error'); });
+    return r.json();
+  }).then(function(data) {
+    var reply = data.content[0].text;
+    conversationHistory.push({ role: 'assistant', content: reply });
+
+    // Intentar parsear como senal
+    var senal = parsearSenal(reply);
+    var cardHtml = buildSignalCard(reply, senal);
+
+    if (cardHtml) {
+      agregarSignalCard(cardHtml, reply);
+    } else {
+      agregarMensajeTexto(reply);
+    }
+    setLoading(false);
+  }).catch(function(e) {
+    agregarMensajeTexto('Error: ' + e.message);
+    setLoading(false);
+  });
+}
+
+function agregarSignalCard(cardHtml, rawText) {
+  var chat = document.getElementById('chatArea');
+  var wrap = document.createElement('div');
+  wrap.className = 'msg msg-ai';
+  var label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = 'CLAUDE AI · SENAL';
+  // Toggle para ver texto completo
+  var toggle = document.createElement('div');
+  toggle.style.cssText = 'font-size:10px;color:var(--text3);cursor:pointer;padding:4px;font-family:Space Mono,monospace;margin-bottom:6px;';
+  toggle.textContent = '+ ver analisis completo';
+  var rawDiv = document.createElement('div');
+  rawDiv.className = 'msg-plain';
+  rawDiv.style.display = 'none';
+  rawDiv.textContent = rawText;
+  toggle.onclick = function() {
+    var vis = rawDiv.style.display !== 'none';
+    rawDiv.style.display = vis ? 'none' : 'block';
+    toggle.textContent = vis ? '+ ver analisis completo' : '- ocultar analisis';
+  };
+  var cardDiv = document.createElement('div');
+  cardDiv.innerHTML = cardHtml;
+  wrap.appendChild(label);
+  wrap.appendChild(cardDiv);
+  wrap.appendChild(toggle);
+  wrap.appendChild(rawDiv);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function agregarMensajeTexto(text) {
+  var chat = document.getElementById('chatArea');
+  var wrap = document.createElement('div');
+  wrap.className = 'msg msg-ai';
+  var label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = 'CLAUDE AI';
+  var bubble = document.createElement('div');
+  bubble.className = 'msg-plain';
+  bubble.textContent = text;
+  wrap.appendChild(label);
+  wrap.appendChild(bubble);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// ═══ CALCULADORA ═══
+function calcularRiesgo() {
+  var capital = parseFloat(document.getElementById('rCapital').value);
+  var entrada = parseFloat(document.getElementById('rEntrada').value);
+  var stop = parseFloat(document.getElementById('rStop').value);
+  var riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
+  if (!capital || !entrada || !stop) { showToast('Rellena todos los campos', 'error'); return; }
+  var ur = capital * (riskPct / 100);
+  var sp = Math.abs((entrada - stop) / entrada * 100);
+  var un = ur / Math.abs(entrada - stop);
+  document.getElementById('rUSDT').textContent = '$' + ur.toFixed(2);
+  document.getElementById('rUnidades').textContent = un.toFixed(0);
+  document.getElementById('rStopPct').textContent = sp.toFixed(2) + '%';
+  document.getElementById('riskResults').style.display = 'block';
+}
+
+// ═══ UI ═══
+function ocultarWelcome() { var w = document.getElementById('welcome'); if (w) w.style.display = 'none'; }
+
+function agregarMensaje(role, text) {
+  var chat = document.getElementById('chatArea');
+  var div = document.createElement('div');
+  div.className = 'msg msg-' + role;
+  var label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = role === 'user' ? 'TU' : 'CLAUDE AI';
+  var bubble = document.createElement('div');
+  if (role === 'user') {
+    bubble.className = 'msg-bubble-user';
+    bubble.textContent = text;
+  } else {
+    bubble.className = 'msg-plain';
+    bubble.textContent = text;
+  }
+  div.appendChild(label);
+  div.appendChild(bubble);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function setLoading(state) {
+  document.getElementById('sendBtn').disabled = state;
+  document.getElementById('userInput').disabled = state;
+  if (state) {
+    var chat = document.getElementById('chatArea');
+    loadingEl = document.createElement('div');
+    loadingEl.className = 'loading-msg';
+    loadingEl.innerHTML = '<div class="spinner"></div><span>Analizando el mercado...</span>';
+    chat.appendChild(loadingEl);
+    chat.scrollTop = chat.scrollHeight;
+  } else { if (loadingEl) { loadingEl.remove(); loadingEl = null; } }
+}
+
+function showToast(msg, type) {
+  type = type || '';
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 2800);
+}
+</script>
+</body>
+</html>
