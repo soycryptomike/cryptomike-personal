@@ -70,11 +70,10 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 .lev-row label{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;}
 .lev-row input[type=range]{flex:1;accent-color:var(--accent);}
 .lev-val{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--accent);min-width:36px;text-align:right;}
-.order-type-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px;}
+.order-type-selector{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
 .otype-btn{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:6px 4px;cursor:pointer;font-size:10px;font-weight:600;font-family:'Space Mono',monospace;color:var(--text3);text-align:center;transition:all .15s;}
 .otype-btn.active.market{border-color:var(--accent);color:var(--accent);background:rgba(200,241,53,.08);}
 .otype-btn.active.limit{border-color:#00aae4;color:#00aae4;background:rgba(0,170,228,.08);}
-.otype-btn.active.stop{border-color:var(--warn);color:var(--warn);background:rgba(251,191,36,.08);}
 .otype-btn:hover{border-color:var(--text2);}
 .order-type-info{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:8px;line-height:1.5;}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
@@ -142,7 +141,6 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 .order-rec-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;font-family:'Space Mono',monospace;}
 .rec-market{background:rgba(200,241,53,.15);color:var(--accent);border:1px solid rgba(200,241,53,.3);}
 .rec-limit{background:rgba(0,174,228,.15);color:#00aae4;border:1px solid rgba(0,174,228,.3);}
-.rec-stop{background:rgba(251,191,36,.15);color:var(--warn);border:1px solid rgba(251,191,36,.3);}
 .order-rec-reason{font-size:11px;color:var(--text2);line-height:1.5;}
 .signal-execute{padding:14px 18px;border-top:1px solid var(--border2);background:rgba(200,241,53,.02);}
 .signal-execute-title{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;font-family:'Space Mono',monospace;}
@@ -154,11 +152,10 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 .exec-row label{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;}
 .exec-row input[type=range]{flex:1;accent-color:var(--accent);}
 .exec-lev-val{font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--accent);min-width:36px;text-align:right;}
-.exec-type-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;}
+.exec-type-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
 .exec-type-btn{padding:7px 4px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700;font-family:'Space Mono',monospace;text-align:center;border:1px solid var(--border2);background:var(--bg);color:var(--text3);transition:all .15s;}
 .exec-type-btn.sel-market{border-color:var(--accent);color:var(--accent);background:rgba(200,241,53,.08);}
 .exec-type-btn.sel-limit{border-color:#00aae4;color:#00aae4;background:rgba(0,170,228,.08);}
-.exec-type-btn.sel-stop{border-color:var(--warn);color:var(--warn);background:rgba(251,191,36,.08);}
 .exec-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .exec-btn-long{background:rgba(74,222,128,.15);color:var(--up);border:1px solid rgba(74,222,128,.4);padding:10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:700;}
 .exec-btn-long:hover{background:rgba(74,222,128,.25);}
@@ -316,7 +313,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
       <div class="welcome" id="welcome">
         <div class="welcome-icon">⚡</div>
         <h2>CryptoMike Personal Trader</h2>
-        <p>Analiza con Claude, recibe senales estructuradas con niveles exactos y ejecuta ordenes a mercado, limite o stop directamente desde aqui.</p>
+        <p>Analiza con Claude, recibe senales estructuradas con niveles exactos y ejecuta ordenes a mercado o limite directamente desde aqui.</p>
         <div class="welcome-cmds">
           <div class="welcome-cmd" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
           <div class="welcome-cmd" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
@@ -349,14 +346,12 @@ var priceInterval = null;
 var activeExchange = 'bitunix';
 var loadingEl = null;
 
-// FUNCIÓN LIMPIADORA PARA ASEGURAR QUE LAS COMAS SEAN PUNTOS DECIMALES
 function getVal(id) {
   var el = document.getElementById(id);
   if (!el || !el.value) return 0;
   return parseFloat(el.value.replace(/,/g, '.'));
 }
 
-// ═══ EXCHANGE ═══
 function selectExchange(ex) {
   activeExchange = ex;
   ['bitunix','bitmart'].forEach(function(e) {
@@ -372,7 +367,6 @@ function sideTab(el, panelId) {
   document.getElementById(panelId).classList.add('active');
 }
 
-// ═══ CONEXION ═══
 function conectar() {
   var ak = document.getElementById('anthropicKey').value.trim();
   if (!ak) { showToast('Introduce tu Anthropic API Key', 'error'); return; }
@@ -390,7 +384,6 @@ function conectar() {
   setInterval(fetchPositions, 30000);
 }
 
-// ═══ PRECIOS ═══
 function fetchPrices() {
   var syms = { XLM: 'XLMUSDT', XRP: 'XRPUSDT', HBAR: 'HBARUSDT' };
   Object.keys(syms).forEach(function(sym) {
@@ -417,7 +410,6 @@ function seleccionarActivo(sym) {
   sendCmd('ANALIZA ' + sym);
 }
 
-// ═══ SERVER REQUESTS ═══
 function srvReq(url, body) {
   return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     .then(function(r) { return r.json(); }).catch(function(e) { showToast('Error red: ' + e.message, 'error'); return null; });
@@ -438,9 +430,7 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
-// ═══ EJECUTAR ORDEN (desde signal card) ═══
 function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
-  // AQUÍ ESTÁ LA MAGIA PARA QUE LAS COMAS NO ROMPAN BITUNIX
   var usdt = getVal('exec-usdt-' + sym);
   var entradaFinal = getVal('exec-entry-' + sym) || entrada;
   var slFinal = getVal('exec-sl-' + sym) || sl;
@@ -454,11 +444,10 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
   var precio = prices[sym] || entradaFinal;
   if (!precio) { showToast('Precio no disponible', 'error'); return; }
 
-  var ot = document.querySelector('#exec-types-' + sym + ' .sel-market, #exec-types-' + sym + ' .sel-limit, #exec-types-' + sym + ' .sel-stop');
+  var ot = document.querySelector('#exec-types-' + sym + ' .sel-market, #exec-types-' + sym + ' .sel-limit');
   if (ot) {
     if (ot.classList.contains('sel-market')) orderType = 'market';
-    else if (ot.classList.contains('sel-limit')) orderType = 'limit';
-    else orderType = 'stop';
+    else orderType = 'limit';
   }
 
   var precioEjecucion = orderType === 'market' ? precio : entradaFinal;
@@ -469,8 +458,8 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
     bitunixReq('leverage', { symbol: sym + 'USDT', leverage: lev }).then(function() {
       showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
       var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
-      if (orderType === 'limit' || orderType === 'stop') {
-        orderBody.orderType = orderType;
+      if (orderType === 'limit') {
+        orderBody.orderType = 'limit';
         orderBody.price = entradaFinal;
       }
       return bitunixReq('order', orderBody);
@@ -483,8 +472,8 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
     bitmartReq('leverage', { symbol: sym + '_USDT', leverage: lev, openType: 'isolated' }).then(function() {
       showToast('Enviando orden ' + orderType + ' a BitMart...', '');
       var orderBody = { symbol: sym + '_USDT', side: side, size: size, sl: slFinal, tp: tpFinal };
-      if (orderType === 'limit' || orderType === 'stop') {
-        orderBody.type = orderType;
+      if (orderType === 'limit') {
+        orderBody.type = 'limit';
         orderBody.price = entradaFinal;
       } else {
         orderBody.type = 'market';
@@ -499,15 +488,14 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
 
 function setExecOrderType(sym, type) {
   var btns = document.querySelectorAll('#exec-types-' + sym + ' .exec-type-btn');
-  btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit','sel-stop'); });
+  btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit'); });
   var btn = document.getElementById('exec-' + type + '-' + sym);
   if (btn) btn.classList.add('sel-' + type);
   var info = document.getElementById('exec-typeinfo-' + sym);
   if (info) {
     var msgs = {
       market: 'Entra ahora al precio de mercado. Usa cuando quieres entrar inmediatamente.',
-      limit: 'Orden pendiente al precio de entrada del analisis. Se ejecuta si el precio llega a ese nivel.',
-      stop: 'Orden en ruptura. Se activa cuando el precio rompe el nivel de entrada (util para BOS).'
+      limit: 'Orden pendiente al precio de entrada del analisis. Se ejecuta si el precio llega a ese nivel.'
     };
     info.textContent = msgs[type] || '';
   }
@@ -516,7 +504,7 @@ function setExecOrderType(sym, type) {
 function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderType, errMsg) {
   ocultarWelcome();
   var exchName = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
-  var otLabel = { market: 'MERCADO', limit: 'LIMITE', stop: 'STOP' };
+  var otLabel = { market: 'MERCADO', limit: 'LIMITE' };
   var div = document.createElement('div');
   div.className = 'msg msg-ai';
   if (ok) {
@@ -543,7 +531,6 @@ function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderTy
   document.getElementById('chatArea').scrollTop = 99999;
 }
 
-// ═══ POSICIONES ═══
 function fetchPositions() {
   var apiKey = activeExchange === 'bitunix' ? document.getElementById('bitunixKey').value.trim() : document.getElementById('bitmartKey').value.trim();
   if (!apiKey) return;
@@ -572,7 +559,6 @@ function fetchPositions() {
   }).catch(function() {});
 }
 
-// ═══ SISTEMA DINÁMICO DE BÚSQUEDA (EL NUEVO CEREBRO) ═══
 function sendCmd(cmd) {
   document.getElementById('userInput').value = cmd;
   enviar();
@@ -587,12 +573,10 @@ function enviar() {
   var parts = msg.split(' ');
   var cmd = parts[0].toUpperCase();
   
-  // Si le pedimos un análisis o setup, buscar el precio en tiempo real de ESA moneda
   if ((cmd === 'ANALIZA' || cmd === 'SETUP' || cmd === 'FUNDAMENTAL') && parts.length >= 2) {
     var sym = parts[1].toUpperCase();
     setLoading(true);
     
-    // Conexión relámpago a Binance para cualquier par
     fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + 'USDT')
       .then(function(r) { return r.json(); })
       .then(function(d) {
@@ -604,7 +588,7 @@ function enviar() {
         enviarMensaje(msg);
       }).catch(function() {
         setLoading(false);
-        enviarMensaje(msg); // Si falla (ej. moneda rara), lo manda sin precio
+        enviarMensaje(msg);
       });
   } else {
     enviarMensaje(msg);
@@ -619,7 +603,6 @@ function parsearSenal(text) {
     ratioTp1: null, structure: null, sesgo: null
   };
 
-  // Extrae de forma dinámica cualquier asset de 3 a 5 letras
   var m = text.match(/ANALISIS\s+([A-Z]+)[\s\/].*?\$([\d.]+)/i) || text.match(/([A-Z]{3,5})\s*[|/]\s*\$([\d.]+)/);
   if (m) { data.asset = m[1]; data.price = parseFloat(m[2]); }
   if (!data.asset) {
@@ -660,10 +643,8 @@ function parsearSenal(text) {
   var sesM = text.match(/[Ss]esgo\s+(?:fundamental)?[:\s]+(ALCISTA|BAJISTA|NEUTRAL)/i);
   if (sesM) data.sesgo = sesM[1].toUpperCase();
 
-  if (/BOS|ruptura|breakout/i.test(text)) {
-    data.orderType = 'stop';
-    data.orderReason = 'El analisis detecta una ruptura de estructura (BOS). Orden STOP se activa cuando el precio confirma la ruptura.';
-  } else if (/retest|pullback|orden bloque|order block|retroceso/i.test(text)) {
+  // ELIMINADA LA OPCION DE RECOMENDAR STOP AL PARSEAR
+  if (/retest|pullback|orden bloque|order block|retroceso/i.test(text)) {
     data.orderType = 'limit';
     data.orderReason = 'El analisis espera un retroceso a zona de interes. Orden LIMITE al precio de entrada para capturar el retest.';
   } else if (/setup valido[:\s]+SI|precio.*zona/i.test(text)) {
@@ -674,7 +655,7 @@ function parsearSenal(text) {
     data.orderReason = 'No hay setup claro. Espera confirmacion antes de entrar.';
   } else {
     data.orderType = 'limit';
-    data.orderReason = 'Sin ruptura activa detectada. Orden LIMITE al nivel de entrada del analisis.';
+    data.orderReason = 'Orden LIMITE recomendada al nivel de entrada del analisis.';
   }
 
   return data;
@@ -696,9 +677,11 @@ function buildSignalCard(text, senal) {
 
   var orderBadgeHtml = '';
   var orderTypeSelected = senal.orderType || 'limit';
+  if (orderTypeSelected === 'stop') orderTypeSelected = 'limit'; // Force fallback
+
   if (senal.orderType) {
-    var obClass = { market: 'rec-market', limit: 'rec-limit', stop: 'rec-stop' }[senal.orderType] || 'rec-limit';
-    var obLabel = { market: 'MERCADO', limit: 'LIMITE', stop: 'STOP' }[senal.orderType] || 'LIMITE';
+    var obClass = { market: 'rec-market', limit: 'rec-limit' }[orderTypeSelected] || 'rec-limit';
+    var obLabel = { market: 'MERCADO', limit: 'LIMITE' }[orderTypeSelected] || 'LIMITE';
     orderBadgeHtml = '<div class="order-rec">' +
       '<div class="order-rec-title">Tipo de orden recomendado</div>' +
       '<div class="order-rec-type"><span class="order-rec-badge ' + obClass + '">' + obLabel + '</span></div>' +
@@ -712,12 +695,12 @@ function buildSignalCard(text, senal) {
   var tp2Val = senal.tp2 ? '$' + senal.tp2.toFixed(4) : '';
   var tp3Val = senal.tp3 ? '$' + senal.tp3.toFixed(4) : '';
 
-  var riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
   var execEntry = senal.entry || (precioActual || 0);
   var execSL = senal.sl || 0;
 
   var execPanel = '';
-  if (senal.direction && (senal.sl || senal.tp1)) {
+  // AHORA SE MUESTRA SIEMPRE QUE HAYA UN ACTIVO VALIDO
+  if (sym !== '???') {
     var defOT = orderTypeSelected;
     execPanel = '<div class="signal-execute">' +
       '<div class="signal-execute-title">Ejecutar operativa</div>' +
@@ -729,10 +712,10 @@ function buildSignalCard(text, senal) {
         '<div class="exec-field"><label>TP $</label><input type="text" id="exec-tp-' + sym + '" value="' + (senal.tp1 ? senal.tp1.toFixed(4) : '') + '" /></div>' +
         '<div class="exec-field"><label>USDT riesgo</label><input type="text" id="exec-risk-' + sym + '" value="--" readonly style="color:var(--text3)" /></div>' +
       '</div>' +
-      '<div class="exec-type-row" id="exec-types-' + sym + '">' +
+      // ELIMINADO EL BOTON DE ORDEN STOP
+      '<div class="exec-type-row" id="exec-types-' + sym + '" style="grid-template-columns: 1fr 1fr;">' +
         '<div class="exec-type-btn ' + (defOT === 'market' ? 'sel-market' : '') + '" id="exec-market-' + sym + '" onclick="setExecOrderType(\'' + sym + '\',\'market\')">MERCADO</div>' +
         '<div class="exec-type-btn ' + (defOT === 'limit' ? 'sel-limit' : '') + '" id="exec-limit-' + sym + '" onclick="setExecOrderType(\'' + sym + '\',\'limit\')">LIMITE</div>' +
-        '<div class="exec-type-btn ' + (defOT === 'stop' ? 'sel-stop' : '') + '" id="exec-stop-' + sym + '" onclick="setExecOrderType(\'' + sym + '\',\'stop\')">STOP</div>' +
       '</div>' +
       '<div id="exec-typeinfo-' + sym + '" style="font-size:10px;color:var(--text3);font-family:\'Space Mono\',monospace;margin-bottom:10px;line-height:1.5;"></div>' +
       '<div class="exec-btns">' +
@@ -799,8 +782,8 @@ function enviarMensaje(msg) {
   setLoading(true);
   conversationHistory.push({ role: 'user', content: msg });
 
-  // NUEVO PROMPT ABIERTO A CUALQUIER CRYPTO
-  var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Analizas CUALQUIER criptomoneda (BTC, ETH, SOL, etc.) en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Ratio minimo 1:3. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / SIN POSICION\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE / STOP\n- Razon: [explicacion breve de por que ese tipo de orden segun el contexto tecnico]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.\n\nCOMANDOS: SETUP=solo setup y tipo de orden | FUNDAMENTAL=solo fundamental | NOTICIAS=5 catalizadores con impacto | COMPARAR=tabla+veredicto | RIESGO [capital] [entrada] [stop]=calculo posicion';
+  // PROMPT MODIFICADO PARA ELIMINAR CUALQUIER MENCION A STOP ORDERS
+  var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Analizas CUALQUIER criptomoneda (BTC, ETH, SOL, etc.) en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Ratio minimo 1:3. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / SIN POSICION\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE\n- Razon: [explicacion breve de por que ese tipo de orden segun el contexto tecnico]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.\n\nCOMANDOS: SETUP=solo setup y tipo de orden | FUNDAMENTAL=solo fundamental | NOTICIAS=5 catalizadores con impacto | COMPARAR=tabla+veredicto | RIESGO [capital] [entrada] [stop]=calculo posicion';
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
