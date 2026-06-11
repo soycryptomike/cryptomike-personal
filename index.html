@@ -123,7 +123,7 @@ body {
 .cmd-btn {
   background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm);
   padding: 7px 5px; cursor: pointer; font-size: 10px; font-family: 'Space Mono', monospace;
-  color: var(--text2); text-align: center;
+  color: var(--text2); text-align: center; display: flex; align-items: center; justify-content: center;
 }
 .cmd-btn:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -159,13 +159,13 @@ body {
 .pos-pnl { font-size: 14px; font-weight: 600; font-family: 'Space Mono', monospace; margin-top: 4px; }
 
 /* CHAT AREA */
-.chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
 .msg { display: flex; flex-direction: column; gap: 4px; }
 .msg-user { align-items: flex-end; }
 .msg-ai { align-items: flex-start; }
 .msg-label { font-size: 9px; color: var(--text3); font-family: 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; padding: 0 4px; }
-.msg-bubble-user { background: var(--accent); color: #0a0a0f; border-radius: var(--radius) var(--radius) 4px var(--radius); font-weight: 500; max-width: 70%; padding: 10px 14px; font-size: 13px; }
-.msg-plain { background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 4px var(--radius) var(--radius) var(--radius); width: 100%; max-width: 100%; white-space: pre-wrap; padding: 12px 14px; font-size: 13px; line-height: 1.7; }
+.msg-bubble-user { background: var(--accent); color: #0a0a0f; border-radius: var(--radius) var(--radius) 4px var(--radius); font-weight: 500; max-width: 85%; padding: 10px 14px; font-size: 13px; }
+.msg-plain { background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 4px var(--radius) var(--radius) var(--radius); width: 100%; max-width: 100%; white-space: pre-wrap; padding: 14px 18px; font-size: 13px; line-height: 1.7; }
 
 .signal-card { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); overflow: hidden; font-family: 'Space Grotesk', sans-serif; }
 .signal-header { padding: 14px 18px; background: var(--surface2); border-bottom: 1px solid var(--border2); display: flex; align-items: center; justify-content: space-between; }
@@ -235,7 +235,7 @@ body {
     <div class="logo-mark">CM</div>
     <div>
       <div class="logo-text">CryptoMike Trader</div>
-      <div class="logo-sub">uso personal · móvil y multi-tp</div>
+      <div class="logo-sub">uso personal · IA conversacional</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
@@ -247,12 +247,12 @@ body {
 <div class="main">
   <aside class="sidebar">
     <div class="tabs">
-      <div class="tab active" onclick="sideTab(this,'tab-config')">Config</div>
-      <div class="tab" onclick="sideTab(this,'tab-analisis')">Comandos</div>
+      <div class="tab" onclick="sideTab(this,'tab-config')">Config</div>
+      <div class="tab active" onclick="sideTab(this,'tab-analisis')">Comandos</div>
       <div class="tab" onclick="sideTab(this,'tab-posiciones')">Posiciones</div>
     </div>
 
-    <div id="tab-config" class="tab-panel active">
+    <div id="tab-config" class="tab-panel">
       <div class="s-block" style="padding-top:10px;">
         <div class="field">
           <label>TELEGRAM CHAT ID (Alertas)</label>
@@ -279,13 +279,35 @@ body {
       </div>
     </div>
 
-    <div id="tab-analisis" class="tab-panel">
+    <div id="tab-analisis" class="tab-panel active">
       <div class="s-block" style="padding-top:10px;">
+        <div style="font-size:10px; color:var(--text2); margin-bottom:8px; font-family:'Space Mono', monospace;">TUS FAVORITOS</div>
         <div class="cmd-grid">
           <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
           <div class="cmd-btn" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
           <div class="cmd-btn" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA XAUUSDT</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA ORO</div>
+        </div>
+        
+        <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">TOP CRYPTO</div>
+        <div class="cmd-grid">
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA BNB')">ANALIZA BNB</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA ADA')">ANALIZA ADA</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA DOGE')">ANALIZA DOGE</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA AVAX')">ANALIZA AVAX</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA LINK')">ANALIZA LINK</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA DOT')">ANALIZA DOT</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA SUI')">ANALIZA SUI</div>
+        </div>
+
+        <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">CHAT & COMPARATIVAS</div>
+        <div class="cmd-grid" style="grid-template-columns: 1fr;">
+          <div class="cmd-btn" onclick="sendCmd('XRP vs XLM comparativa rápida. ¿En cuál es mejor entrar ahora? Dame operativa del ganador.')">XRP vs XLM ¿Cuál es mejor?</div>
+          <div class="cmd-btn" onclick="sendCmd('SOL vs ETH. Compara fundamentales y dame un setup de la que tenga mejor estructura.')">SOL vs ETH (Setup)</div>
+          <div class="cmd-btn" onclick="sendCmd('Analiza BTC y dime si afectará a mis operativas de XRP y HBAR hoy.')">Impacto de BTC en Altcoins</div>
         </div>
       </div>
     </div>
@@ -302,7 +324,7 @@ body {
     <div class="input-area">
       <div class="input-row">
         <div class="input-wrap">
-          <input type="text" id="userInput" placeholder="Ej: ANALIZA BTC" onkeydown="if(event.key==='Enter')enviar()" />
+          <input type="text" id="userInput" placeholder="Ej: Analiza XRP o pregúntale lo que quieras..." onkeydown="if(event.key==='Enter')enviar()" />
         </div>
         <button class="send-btn" id="sendBtn" onclick="enviar()">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -341,7 +363,6 @@ function sideTab(el, panelId) {
   document.getElementById(panelId).classList.add('active');
 }
 
-// RESTAURADO EL FETCH DE PRECIOS Y POSICIONES CORRECTAMENTE
 function conectar() {
   var ak = document.getElementById('anthropicKey').value.trim();
   if (!ak) { showToast('Introduce tu Anthropic API Key', 'error'); return; }
@@ -403,12 +424,11 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
-// RESTAURADA LA EJECUCION REAL CON EL SERVIDOR ACTUAL (Usando TP1 como TP Principal por ahora)
 function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType) {
   var usdt = getVal('exec-usdt-' + uid);
   var entradaFinal = getVal('exec-entry-' + uid) || entrada;
   var slFinal = getVal('exec-sl-' + uid) || sl;
-  var tpFinal = getVal('exec-tp1-' + uid) || tp; // Usamos el TP1 para abrir la orden inicial
+  var tpFinal = getVal('exec-tp1-' + uid) || tp; 
   var lev = getVal('exec-lev-' + uid) || leverage;
 
   if (!usdt || usdt <= 0) { showToast('Introduce la cantidad en USDT', 'error'); return; }
@@ -433,11 +453,13 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     bitunixReq('leverage', { symbol: sym + 'USDT', leverage: lev }).then(function() {
       showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
       var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
+      
+      // EL BUG ESTABA AQUI: Bitunix necesita 'LIMIT' y 'MARKET' en MAYÚSCULAS
       if (orderType === 'limit') {
-        orderBody.orderType = 'limit';
+        orderBody.orderType = 'LIMIT';
         orderBody.price = entradaFinal;
       } else {
-        orderBody.orderType = 'market';
+        orderBody.orderType = 'MARKET';
       }
       return bitunixReq('order', orderBody);
     }).then(function(res) {
@@ -449,6 +471,7 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     bitmartReq('leverage', { symbol: sym + '_USDT', leverage: lev, openType: 'isolated' }).then(function() {
       showToast('Enviando orden ' + orderType + ' a BitMart...', '');
       var orderBody = { symbol: sym + '_USDT', side: side, size: size, sl: slFinal, tp: tpFinal };
+      
       if (orderType === 'limit') {
         orderBody.type = 'limit';
         orderBody.price = entradaFinal;
@@ -537,42 +560,58 @@ function sendCmd(cmd) {
   enviar(); 
 }
 
+// NUEVA FUNCIÓN ENVIAR SÚPER INTELIGENTE (Detecta cryptos libres y carga su precio)
 function enviar() {
   var input = document.getElementById('userInput');
-  var msg = input.value.trim();
-  if (!msg) return; 
+  var userText = input.value.trim();
+  if (!userText) return; 
   input.value = '';
   
-  var parts = msg.split(' ');
-  if (['ANALIZA', 'SETUP', 'FUNDAMENTAL'].includes(parts[0].toUpperCase()) && parts.length >= 2) {
-    var sym = parts[1].toUpperCase();
-    fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + (sym === 'XAUUSDT' ? '' : 'USDT'))
-      .then(r => r.json())
-      .then(d => {
-        if(d.price) { 
-          prices[sym] = parseFloat(d.price); 
-          msg = parts[0] + ' ' + sym + ' $' + d.price; 
-        }
-        enviarMensaje(msg);
-      }).catch(() => enviarMensaje(msg));
-  } else { 
-    enviarMensaje(msg); 
-  }
+  var chat = document.getElementById('chatArea');
+  chat.innerHTML += `<div class="msg msg-user"><div class="msg-bubble-user">${userText}</div></div>`;
+  chat.scrollTop = chat.scrollHeight;
+
+  setLoading(true);
+
+  // Analiza el texto del usuario buscando acrónimos (BTC, ADA, XRP, etc.)
+  var words = userText.toUpperCase().match(/\b[A-Z]{3,8}\b/g) || [];
+  var ignore = ['QUE','POR','CON','LAS','LOS','DEL','UNA','UNO','MAS','MUY','SON','SIN','HAY','AQUI','ESTA','ESTE','ESO','ESE','ASI','CUAL','MEJOR','ANALIZA','SETUP','FUNDAMENTAL','COMPARA','ENTRAR','AHORA'];
+  var syms = [...new Set(words.filter(w => !ignore.includes(w)))];
+  
+  // Conecta a Binance rápido para buscar los precios reales de lo que estás preguntando
+  var fetchPromises = syms.map(sym => {
+    if (!prices[sym]) {
+      return fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + (sym === 'XAUUSDT' ? '' : 'USDT'))
+        .then(r => r.json())
+        .then(d => { if(d.price) prices[sym] = parseFloat(d.price); })
+        .catch(e => null);
+    }
+    return Promise.resolve();
+  });
+
+  Promise.all(fetchPromises).then(() => {
+    var contextPrices = syms.filter(s => prices[s]).map(s => s + '=$' + prices[s].toFixed(5)).join(', ');
+    var finalMsg = userText;
+    
+    // Si ha encontrado precios, se los pasa a Claude por la "puerta trasera"
+    if (contextPrices) {
+        finalMsg += '\n\n[INFO INTERNA DEL SISTEMA: Precios actuales en vivo para que los uses en tu analisis -> ' + contextPrices + ']';
+    }
+    llamarClaude(finalMsg, userText);
+  });
 }
 
-// RESTAURADO EL PROMPT COMPLETO PARA CLAUDE
-function enviarMensaje(msg) {
+function llamarClaude(promptText, originalText) {
   var ak = document.getElementById('anthropicKey').value.trim();
-  if (!ak) return showToast('Introduce Anthropic API Key', 'error');
+  if (!ak) { 
+    setLoading(false);
+    return showToast('Introduce Anthropic API Key', 'error'); 
+  }
   
-  var chat = document.getElementById('chatArea');
-  chat.innerHTML += `<div class="msg msg-user"><div class="msg-bubble-user">${msg}</div></div>`;
-  
-  setLoading(true);
-  
-  var sp = 'Eres CryptoAdvisor, asesor de trading para CryptoMike. Analizas CUALQUIER criptomoneda en futuros perpetuos. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Max 2h por operacion. Riesgo 2%. Contexto: bear market junio 2026, BTC 67k, Fear&Greed 12.\n\nREGLA VITAL DE FORMATO: Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n\nREGLAS VITALES DE COHERENCIA LOGICA:\n1. Si la Direccion es LONG: El Stop Loss TIENE QUE SER MENOR que la Entrada. Los Take Profit TIENEN QUE SER MAYORES que la Entrada. El sesgo debe ser ALCISTA.\n2. Si la Direccion es SHORT: El Stop Loss TIENE QUE SER MAYOR que la Entrada. Los Take Profit TIENEN QUE SER MENORES que la Entrada. El sesgo debe ser BAJISTA.\n3. NUNCA des una direccion LONG si tu SL es mayor a la entrada, y NUNCA des un SHORT si tu SL es menor.\n\nFORMATO OBLIGATORIO PARA ANALISIS COMPLETO:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Catalizadores activos: [lista]\n- Sentimiento mercado: Fear&Greed [N]/100\n- Correlacion BTC: [descripcion]\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Tendencia macro: [descripcion]\n- Ultimo BOS: $[nivel]\n- CHoCH reciente: [si/no y nivel]\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nZONAS DE INTERES\n- Order Block alcista: $[zona]\n- Order Block bajista: $[zona]\n- FVG bullish: $[rango]\n- FVG bearish: $[rango]\n- Liquidez BSL: $[niveles]\n- Liquidez SSL: $[niveles]\n- Soporte clave: $[precio]\n- Resistencia clave: $[precio]\n\nSETUP OPERATIVO\n- Setup valido: SI / NO / ESPERAR\n- Direccion: LONG / SHORT / ESPERAR\n- Zona entrada: $[precio]\n- Confirmacion 5M: [descripcion]\n- Stop Loss: $[precio] (justificacion SMC)\n- TP1: $[precio] - ratio [X]:1\n- TP2: $[precio] - ratio [X]:1\n- TP3: $[precio] - ratio [X]:1\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Invalidacion: $[precio]\n\nTIPO DE ORDEN RECOMENDADO\n- Tipo: MERCADO / LIMITE\n- Razon: [explicacion breve]\n\nRESUMEN EJECUTIVO\n- Situacion: [2-3 frases]\n- Nivel critico: $[precio]\n- Accion: COMPRAR / VENDER / ESPERAR\n- Confianza: [X]/10\n==========================\nAVISO: Solo educativo.';
+  // INSTRUCCIONES MEJORADAS PARA CHAT NATURAL O FORMATO DE SEÑAL
+  var sp = 'Eres CryptoAdvisor, asesor de trading. Analizas CUALQUIER criptomoneda. Metodologia SMC/ICT. HTF 15M/30M, LTF 1M/5M. Riesgo 2%.\n\nREGLA VITAL DE FORMATO: Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n\nMODO DE RESPONDER:\n1. Si el usuario hace una pregunta general, compara activos (ej: XRP vs XLM), o pide consejos, respóndele de forma natural, analiza la situación charlando con él.\n2. Si el usuario te pide explícitamente "Analiza X", o si durante tu charla natural decides recomendar una operativa para entrar ahora, DEBES incluir OBLIGATORIAMENTE al final de tu mensaje el siguiente bloque estructurado para que mi sistema lo detecte:\n\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nSETUP OPERATIVO\n- Direccion: LONG / SHORT / ESPERAR\n- Entrada: $[precio]\n- Stop Loss: $[precio]\n- TP1: $[precio]\n- TP2: $[precio]\n- TP3: $[precio]\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Confianza: [X]/10\n- Razon: [breve razon]\n- Accion: COMPRAR / VENDER / ESPERAR\n==========================\n\nREGLAS LOGICAS DE LA SEÑAL:\n- SHORT: SL MAYOR que Entrada. TPs MENORES que Entrada.\n- LONG: SL MENOR que Entrada. TPs MAYORES que Entrada.';
 
-  conversationHistory.push({ role: 'user', content: msg });
+  conversationHistory.push({ role: 'user', content: promptText });
   
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST', 
@@ -585,12 +624,13 @@ function enviarMensaje(msg) {
     conversationHistory.push({ role: 'assistant', content: reply });
     
     var senal = parsearSenal(reply);
-    var card = buildSignalCard(reply, senal, reply); // Pasamos el texto original para el desplegable
+    var card = buildSignalCard(reply, senal, reply);
     
+    var chat = document.getElementById('chatArea');
     if (card) {
       chat.innerHTML += `<div class="msg msg-ai">${card}</div>`;
     } else {
-      chat.innerHTML += `<div class="msg msg-ai"><div class="msg-plain">${reply}</div></div>`;
+      chat.innerHTML += `<div class="msg msg-ai"><div class="msg-plain">${reply.replace(/\*/g,'')}</div></div>`;
     }
     
     setLoading(false);
@@ -665,7 +705,7 @@ function parsearSenal(text) {
 }
 
 function buildSignalCard(text, senal, rawText) {
-  if (!senal.asset) return null;
+  if (!senal.asset || (!senal.sl && !senal.tp1)) return null;
   
   var sym = senal.asset;
   var uid = 'card_' + Date.now() + Math.floor(Math.random()*100);
@@ -711,7 +751,6 @@ function buildSignalCard(text, senal, rawText) {
       </div>`;
   }
 
-  // Desplegable de análisis
   var analysisHtml = '';
   if (senal.structure || senal.sesgo || senal.orderReason) {
      analysisHtml += '<div class="signal-section">';
@@ -773,26 +812,6 @@ function buildSignalCard(text, senal, rawText) {
   </div>`;
   
   return html;
-}
-
-function setLoading(state) {
-  document.getElementById('sendBtn').disabled = state;
-  document.getElementById('userInput').disabled = state;
-  if (state) {
-    var chat = document.getElementById('chatArea');
-    loadingEl = document.createElement('div');
-    loadingEl.className = 'loading-msg';
-    loadingEl.innerHTML = '<div class="spinner"></div><span>Analizando el mercado...</span>';
-    chat.appendChild(loadingEl);
-    chat.scrollTop = chat.scrollHeight;
-  } else { if (loadingEl) { loadingEl.remove(); loadingEl = null; } }
-}
-
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; 
-  t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 3000);
 }
 </script>
 </body>
