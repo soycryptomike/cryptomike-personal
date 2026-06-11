@@ -680,14 +680,12 @@ function buildSignalCard(text, senal) {
   var confPct = senal.confidence ? (senal.confidence * 10) : 0;
   var confColor = confPct >= 70 ? 'var(--up)' : confPct >= 50 ? 'var(--warn)' : 'var(--down)';
 
-  // Badge de direccion
   var badgeClass = 'badge-neutral';
   var badgeText = senal.action || 'ANALISIS';
   if (senal.action === 'COMPRAR' && senal.direction === 'LONG') { badgeClass = 'badge-long'; badgeText = 'LONG'; }
   else if (senal.action === 'VENDER' && senal.direction === 'SHORT') { badgeClass = 'badge-short'; badgeText = 'SHORT'; }
   else if (senal.action === 'ESPERAR') { badgeClass = 'badge-wait'; badgeText = 'ESPERAR'; }
 
-  // Tipo de orden badge
   var orderBadgeHtml = '';
   var orderTypeSelected = senal.orderType || 'limit';
   if (senal.orderType) {
@@ -700,6 +698,91 @@ function buildSignalCard(text, senal) {
       '</div>';
   }
 
+  var entradaVal = senal.entry ? '$' + senal.entry.toFixed(4) : (precioActual ? '$' + precioActual.toFixed(4) : '--');
+  var slVal = senal.sl ? '$' + senal.sl.toFixed(4) : '--';
+  var tp1Val = senal.tp1 ? '$' + senal.tp1.toFixed(4) : '--';
+  var tp2Val = senal.tp2 ? '$' + senal.tp2.toFixed(4) : '';
+  var tp3Val = senal.tp3 ? '$' + senal.tp3.toFixed(4) : '';
+
+  var riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
+  var capital = 100;
+  var execEntry = senal.entry || (precioActual || 0);
+  var execSL = senal.sl || 0;
+
+  var execPanel = '';
+  if (senal.direction && (senal.sl || senal.tp1)) {
+    var defOT = orderTypeSelected;
+    execPanel = '<div class="signal-execute">' +
+      '<div class="signal-execute-title">Ejecutar operativa</div>' +
+      '<div class="exec-grid">' +
+        '<div class="exec-field"><label>USDT</label><input type="number" id="exec-usdt-' + sym + '" placeholder="20" /></div>' +
+        '<div class="exec-field"><label>ENTRADA $</label><input type="number" id="exec-entry-' + sym + '" value="' + (execEntry > 0 ? execEntry.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>APAL.</label><input type="number" id="exec-lev-' + sym + '" value="10" min="1" max="100" /></div>' +
+        '<div class="exec-field"><label>SL $</label><input type="number" id="exec-sl-' + sym + '" value="' + (execSL > 0 ? execSL.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>TP $</label><input type="number" id="exec-tp-' + sym + '" value="' + (senal.tp1 ? senal.tp1.toFixed(4) : '') + '" step="0.0001" /></div>' +
+        '<div class="exec-field"><label>USDT riesgo</label><input type="text" id="exec-risk-' + sym + '" value="--" readonly style="color:var(--text3)" /></div>' +
+      '</div>' +
+      '<div class="exec-type-row" id="exec-types-' + sym + '">' +
+        '<div class="exec-type-btn ' + (defOT === 'market' ? 'sel-market' : '') + '" id="exec-market-' + sym + '" onclick="setExecOrderType(\'' + sym + '\',\'market\')">MERCADO</div>' +
+        '<div class="exec-type-btn ' + (defOT === 'limit' ? 'sel-limit' : '') + '" id="exec-limit-' + sym + '" onclick="setExecOrderType(\'' + sym + '\',\'limit\')">LIMITE</div>' +
+        '<div class="exec-type-btn ' + (defOT === 'stop' ? 'sel-stop' : '') + '" id="exec-stop-' + sym + '" onclick="setExecOrderType(\'' + sym + '\',\'stop\')">STOP</div>' +
+      '</div>' +
+      '<div id="exec-typeinfo-' + sym + '" style="font-size:10px;color:var(--text3);font-family:\'Space Mono\',monospace;margin-bottom:10px;line-height:1.5;"></div>' +
+      '<div class="exec-btns">' +
+        '<button class="exec-btn-long" onclick="ejecutarDesdeCard(\'' + sym + '\',\'LONG\',' + (execEntry||0) + ',' + (execSL||0) + ',' + (senal.tp1||0) + ',10,\'' + defOT + '\')">▲ LONG</button>' +
+        '<button class="exec-btn-short" onclick="ejecutarDesdeCard(\'' + sym + '\',\'SHORT\',' + (execEntry||0) + ',' + (execSL||0) + ',' + (senal.tp1||0) + ',10,\'' + defOT + '\')">▼ SHORT</button>' +
+      '</div>' +
+    '</div>';
+    setTimeout(function() { setExecOrderType(sym, defOT); }, 100);
+  }
+
+  var html = '<div class="signal-card">' +
+    '<div class="signal-header">' +
+      '<span class="signal-asset">' + sym + '/USDT</span>' +
+      (precioActual ? '<span class="signal-price">$' + precioActual.toFixed(4) + '</span>' : '') +
+      '<span class="signal-badge ' + badgeClass + '">' + badgeText + '</span>' +
+    '</div>' +
+    '<div class="signal-body">';
+
+  if (senal.sl || senal.tp1 || senal.entry) {
+    html += '<div class="signal-section"><div class="signal-section-title">Niveles clave</div>';
+    html += '<div class="signal-levels">';
+    html += '<div class="level-box level-entry"><div class="level-label">Entrada</div><div class="level-value">' + entradaVal + '</div></div>';
+    html += '<div class="level-box level-sl"><div class="level-label">Stop Loss</div><div class="level-value">' + slVal + '</div></div>';
+    html += '<div class="level-box level-tp1"><div class="level-label">TP1' + (senal.ratioTp1 ? ' ' + senal.ratioTp1 + ':1' : '') + '</div><div class="level-value">' + tp1Val + '</div></div>';
+    html += '</div>';
+    if (tp2Val || tp3Val) {
+      html += '<div style="display:flex;gap:8px;margin-top:8px;">';
+      if (tp2Val) html += '<div style="flex:1;background:var(--surface2);border-radius:6px;padding:6px 8px;text-align:center;font-size:11px;color:var(--text2);font-family:\'Space Mono\',monospace;">TP2 <span style="color:var(--up);font-weight:600">' + tp2Val + '</span></div>';
+      if (tp3Val) html += '<div style="flex:1;background:var(--surface2);border-radius:6px;padding:6px 8px;text-align:center;font-size:11px;color:var(--text2);font-family:\'Space Mono\',monospace;">TP3 <span style="color:var(--up);font-weight:600">' + tp3Val + '</span></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  if (senal.structure || senal.sesgo) {
+    html += '<hr class="signal-divider">';
+    html += '<div class="signal-section">';
+    if (senal.structure) html += '<div class="signal-row"><span class="signal-key">Estructura</span><span class="signal-val ' + (senal.structure === 'ALCISTA' ? 'up' : senal.structure === 'BAJISTA' ? 'down' : 'warn') + '">' + senal.structure + '</span></div>';
+    if (senal.sesgo) html += '<div class="signal-row"><span class="signal-key">Sesgo fundamental</span><span class="signal-val ' + (senal.sesgo === 'ALCISTA' ? 'up' : senal.sesgo === 'BAJISTA' ? 'down' : 'neutral') + '">' + senal.sesgo + '</span></div>';
+    html += '</div>';
+  }
+
+  if (senal.confidence) {
+    html += '<hr class="signal-divider">';
+    html += '<div class="signal-section"><div class="signal-row"><span class="signal-key">Confianza</span><span class="signal-val" style="color:' + confColor + '">' + senal.confidence + '/10</span></div>';
+    html += '<div class="confidence-bar"><div class="confidence-fill" style="width:' + confPct + '%;background:' + confColor + '"></div></div></div>';
+  }
+
+  if (orderBadgeHtml) {
+    html += '<hr class="signal-divider">' + orderBadgeHtml;
+  }
+
+  html += '</div>'; 
+  html += execPanel;
+  html += '</div>'; 
+  return html;
+}
   // Niveles
   var entradaVal = senal.entry ? '$' + senal.entry.toFixed(4) : (precioActual ? '$' + precioActual.toFixed(4) : '--');
   var slVal = senal.sl ? '$' + senal.sl.toFixed(4) : '--';
