@@ -224,78 +224,6 @@ body {
   background: var(--accent2);
 }
 
-.btn-ghost {
-  background: var(--surface2);
-  color: var(--text2);
-  border: 1px solid var(--border2);
-}
-
-.btn-ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.btn:disabled {
-  opacity: .4;
-  cursor: not-allowed;
-}
-
-.asset-card {
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.asset-card:hover, .asset-card.active {
-  border-color: var(--accent);
-  background: rgba(200, 241, 53, .04);
-}
-
-.asset-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.asset-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.asset-symbol {
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Space Mono', monospace;
-}
-
-.asset-name {
-  font-size: 10px;
-  color: var(--text3);
-}
-
-.asset-price {
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Space Mono', monospace;
-}
-
-.asset-change {
-  font-size: 10px;
-  font-family: 'Space Mono', monospace;
-}
-
-.up { color: var(--up); }
-.down { color: var(--down); }
-.neutral { color: var(--text3); }
-
 .cmd-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -317,14 +245,6 @@ body {
 .cmd-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
-}
-
-.order-panel {
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  margin-bottom: 8px;
 }
 
 .exec-grid {
@@ -477,6 +397,7 @@ body {
   font-weight: 500;
 }
 
+/* SIGNAL CARD */
 .signal-card {
   width: 100%;
   background: var(--surface);
@@ -519,8 +440,76 @@ body {
   border: 1px solid rgba(248, 113, 113, .4);
 }
 
-.signal-body {
-  padding: 16px 18px;
+.badge-wait {
+  background: rgba(251, 191, 36, .2);
+  color: var(--warn);
+  border: 1px solid rgba(251, 191, 36, .4);
+}
+
+.signal-execute {
+  padding: 14px 18px;
+}
+
+/* SISTEMA DESPLEGABLE DE ANÁLISIS */
+.analysis-toggle {
+  background: var(--surface2);
+  border-top: 1px solid var(--border2);
+  padding: 10px;
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text3);
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.analysis-toggle:hover {
+  color: var(--accent);
+}
+
+.analysis-content {
+  display: none;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-top: 1px solid var(--border2);
+}
+
+.analysis-content.show {
+  display: block;
+}
+
+.signal-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.signal-key {
+  color: var(--text2);
+  min-width: 100px;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.signal-val {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.signal-val.up { color: var(--up); }
+.signal-val.down { color: var(--down); }
+.signal-val.warn { color: var(--warn); }
+.signal-val.neutral { color: var(--text3); }
+
+.signal-divider {
+  border: none;
+  border-top: 1px solid var(--border2);
+  margin: 10px 0;
 }
 
 .input-area {
@@ -578,19 +567,9 @@ body {
   pointer-events: none;
 }
 
-.toast.show {
-  opacity: 1;
-}
-
-.toast.success {
-  border-color: var(--up);
-  color: var(--up);
-}
-
-.toast.error {
-  border-color: var(--down);
-  color: var(--down);
-}
+.toast.show { opacity: 1; }
+.toast.success { border-color: var(--up); color: var(--up); }
+.toast.error { border-color: var(--down); color: var(--down); }
 
 .tabs {
   display: flex;
@@ -612,38 +591,17 @@ body {
   border-bottom-color: var(--accent);
 }
 
-.tab-panel {
-  display: none;
-}
+.tab-panel { display: none; } 
+.tab-panel.active { display: block; }
 
-.tab-panel.active {
-  display: block;
-}
-
-/* RESPONSIVE DESIGN PARA MÓVIL */
+/* MÓVIL RESPONSIVE */
 @media (max-width: 768px) {
-  .main { 
-    display: flex; 
-    flex-direction: column; 
-    height: auto; 
-  }
-  .sidebar { 
-    border-right: none; 
-    border-bottom: 1px solid var(--border); 
-    max-height: 45vh; 
-  }
-  .content { 
-    height: 55vh; 
-  }
-  .exec-grid { 
-    grid-template-columns: 1fr 1fr; 
-  }
-  .header { 
-    padding: 10px 15px; 
-  }
-  .logo-text { 
-    display: none; 
-  }
+  .main { display: flex; flex-direction: column; height: auto; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 45vh; }
+  .content { height: 55vh; }
+  .exec-grid { grid-template-columns: 1fr 1fr; }
+  .header { padding: 10px 15px; }
+  .logo-text { display: none; } 
 }
 </style>
 </head>
@@ -678,6 +636,9 @@ body {
         <div class="field">
           <label>TELEGRAM CHAT ID (Alertas)</label>
           <input type="text" id="telegramId" placeholder="Ej: 828991968" />
+          <div style="font-size:9px; color:var(--text3); margin-top:4px; font-family:'Space Mono', monospace;">
+            ¿No sabes tu ID? <a href="https://t.me/userinfobot" target="_blank" style="color:var(--accent); text-decoration:none;">Descúbrelo aquí</a>
+          </div>
         </div>
         <div class="field">
           <label>ANTHROPIC API KEY</label>
@@ -703,9 +664,10 @@ body {
     <div id="tab-analisis" class="tab-panel">
       <div class="s-block" style="padding-top:10px;">
         <div class="cmd-grid">
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
+          <div class="cmd-btn" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA XAUUSDT</div>
         </div>
       </div>
     </div>
@@ -722,7 +684,7 @@ body {
     <div class="input-area">
       <div class="input-row">
         <div class="input-wrap">
-          <input type="text" id="userInput" placeholder="Ej: ANALIZA BTC" onkeydown="if(event.key==='Enter')enviar()" />
+          <input type="text" id="userInput" placeholder="Ej: ANALIZA XRP" onkeydown="if(event.key==='Enter')enviar()" />
         </div>
         <button class="send-btn" id="sendBtn" onclick="enviar()">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -741,7 +703,6 @@ var prices = {};
 var priceInterval = null;
 var activeExchange = 'bitunix';
 
-// Utilidades para leer valores de inputs
 function getVal(id) { 
   var el = document.getElementById(id); 
   return el && el.value ? parseFloat(el.value.replace(/,/g, '.')) : 0; 
@@ -752,7 +713,6 @@ function getStr(id) {
   return el ? el.value.trim() : ''; 
 }
 
-// Selector de exchange visual
 function selectExchange(ex) {
   activeExchange = ex;
   ['bitunix', 'bitmart'].forEach(function(e) {
@@ -761,7 +721,6 @@ function selectExchange(ex) {
   });
 }
 
-// Cambio de pestañas en la barra lateral
 function sideTab(el, panelId) {
   document.querySelectorAll('.tab').forEach(function(t) { 
     t.classList.remove('active'); 
@@ -773,7 +732,6 @@ function sideTab(el, panelId) {
   document.getElementById(panelId).classList.add('active');
 }
 
-// Conectar e iniciar bucle de precios
 function conectar() {
   document.getElementById('statusDot').classList.add('live');
   document.getElementById('statusText').textContent = 'Live';
@@ -784,10 +742,9 @@ function conectar() {
   priceInterval = setInterval(fetchPrices, 15000);
 }
 
-// Actualizar precios en vivo desde Binance
 function fetchPrices() {
   Object.keys(prices).forEach(function(sym) {
-    fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + 'USDT')
+    fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + (sym === 'XAUUSDT' ? '' : 'USDT'))
       .then(r => r.json())
       .then(d => {
         if(d.price) {
@@ -803,13 +760,11 @@ function fetchPrices() {
   });
 }
 
-// Enviar comandos rápidos
 function sendCmd(cmd) { 
   document.getElementById('userInput').value = cmd; 
   enviar(); 
 }
 
-// Procesar input del usuario
 function enviar() {
   var input = document.getElementById('userInput');
   var msg = input.value.trim();
@@ -820,7 +775,7 @@ function enviar() {
   var parts = msg.split(' ');
   if (['ANALIZA', 'SETUP'].includes(parts[0].toUpperCase()) && parts.length >= 2) {
     var sym = parts[1].toUpperCase();
-    fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + 'USDT')
+    fetch('https://api.binance.com/api/v3/ticker/price?symbol=' + sym + (sym === 'XAUUSDT' ? '' : 'USDT'))
       .then(r => r.json())
       .then(d => {
         if(d.price) { 
@@ -834,14 +789,14 @@ function enviar() {
   }
 }
 
-// Parsear la respuesta de Claude
 function parsearSenal(text) {
   var norm = text.replace(/\*/g, '');
   var data = { 
     asset: null, price: null, entry: null, sl: null, 
     tp1: null, tp2: null, tp3: null, 
     p1: 100, p2: 0, p3: 0, 
-    direction: null, action: 'ESPERAR' 
+    direction: null, action: 'ESPERAR',
+    structure: null, sesgo: null, confidence: null, orderReason: null
   };
 
   var m = norm.match(/ANALISIS\s+([A-Z]+).*?\$([\d.,]+)/i);
@@ -851,12 +806,20 @@ function parsearSenal(text) {
     prices[data.asset] = data.price; 
   }
 
+  // Identificador general de la moneda
+  if (!data.asset) {
+    var am = norm.match(/\b(BTC|ETH|SOL|XLM|XRP|HBAR|XAUUSDT|[A-Z]{3,8})\b/);
+    if (am) data.asset = am[1];
+  }
+
   if (/\bLONG\b|COMPRAR/i.test(norm)) { 
     data.direction = 'LONG'; 
     data.action = 'COMPRAR'; 
   } else if (/\bSHORT\b|VENDER/i.test(norm)) { 
     data.direction = 'SHORT'; 
     data.action = 'VENDER'; 
+  } else if (/\bESPERAR\b/i.test(norm)) { 
+    data.action = 'ESPERAR'; 
   }
 
   var getNum = (regex) => { 
@@ -870,7 +833,7 @@ function parsearSenal(text) {
   data.tp2 = getNum(/TP2[:\s]+\$?([\d.,]+)/i);
   data.tp3 = getNum(/TP3[:\s]+\$?([\d.,]+)/i);
 
-  // Extraer porcentajes de los TP
+  // Parsear porcentajes gestionados por Claude
   var gest = norm.match(/Gestion.*?(?:(\d+)%\s*TP1).*?(?:(\d+)%\s*TP2)?.*?(?:(\d+)%\s*TP3)?/i);
   if (gest) {
     data.p1 = parseInt(gest[1]) || 100;
@@ -878,20 +841,45 @@ function parsearSenal(text) {
     data.p3 = parseInt(gest[3]) || 0;
   }
 
+  // Parsear datos de analisis
+  var strM = norm.match(/[Ee]structura[:\s]+(ALCISTA|BAJISTA|RANGO)/i);
+  if (strM) data.structure = strM[1].toUpperCase();
+
+  var sesM = norm.match(/[Ss]esgo.*?:[\s]+(ALCISTA|BAJISTA|NEUTRAL)/i);
+  if (sesM) data.sesgo = sesM[1].toUpperCase();
+
+  var confM = norm.match(/[Cc]onfianza[:\s]+([\d]+)\s*\/\s*10/);
+  if (confM) data.confidence = parseInt(confM[1]);
+
+  // Razon de la orden extraida libremente de la respuesta
+  var reasonM = norm.match(/Razon:\s*([^\n]+)/i);
+  if (reasonM) {
+    data.orderReason = reasonM[1].trim();
+  } else {
+    data.orderReason = data.action === 'ESPERAR' ? 'No hay setup claro. Espera confirmación.' : 'Condiciones estructurales válidas detectadas.';
+  }
+
   return data;
 }
 
-// Construir la tarjeta visual de la orden
 function buildSignalCard(text, senal) {
   if (!senal.asset) return null;
   
   var sym = senal.asset;
-  var uid = 'card_' + Date.now();
+  var uid = 'card_' + Date.now() + Math.floor(Math.random()*100);
   var pAct = prices[sym] || senal.price || 0;
   var ent = senal.entry || pAct;
   
   var formatInp = (n) => n ? parseFloat(Number(n).toFixed(5)).toString() : '';
 
+  // Badge Header
+  var badgeClass = 'badge-neutral';
+  var badgeText = 'ANALISIS';
+  if (senal.direction === 'LONG' || senal.action === 'COMPRAR') { badgeClass = 'badge-long'; badgeText = 'LONG'; }
+  else if (senal.direction === 'SHORT' || senal.action === 'VENDER') { badgeClass = 'badge-short'; badgeText = 'SHORT'; }
+  else if (senal.action === 'ESPERAR') { badgeClass = 'badge-wait'; badgeText = 'ESPERAR'; }
+
+  // TPs HTML
   var tpHtml = `
     <div class="exec-field">
       <label>TP1 $</label>
@@ -923,12 +911,25 @@ function buildSignalCard(text, senal) {
       </div>`;
   }
 
+  // Generamos el HTML del análisis detallado si existe
+  var analysisHtml = '';
+  if (senal.structure || senal.sesgo || senal.orderReason) {
+     analysisHtml += '<div class="signal-section">';
+     if (senal.orderReason) analysisHtml += '<div style="font-size:11px; color:var(--text2); line-height:1.5; margin-bottom:10px;"><b>Razón entrada:</b> ' + senal.orderReason + '</div>';
+     if (senal.structure) analysisHtml += '<div class="signal-row"><span class="signal-key">Estructura</span><span class="signal-val ' + (senal.structure === 'ALCISTA' ? 'up' : senal.structure === 'BAJISTA' ? 'down' : 'warn') + '">' + senal.structure + '</span></div>';
+     if (senal.sesgo) analysisHtml += '<div class="signal-row"><span class="signal-key">Fundamental</span><span class="signal-val ' + (senal.sesgo === 'ALCISTA' ? 'up' : senal.sesgo === 'BAJISTA' ? 'down' : 'neutral') + '">' + senal.sesgo + '</span></div>';
+     if (senal.confidence) analysisHtml += '<div class="signal-row"><span class="signal-key">Confianza</span><span class="signal-val" style="color:var(--text)">' + senal.confidence + '/10</span></div>';
+     analysisHtml += '</div>';
+  }
+
+  // Construcción de la tarjeta completa
   var html = `
   <div class="signal-card">
     <div class="signal-header">
       <span class="signal-asset">${sym}/USDT</span>
-      <span class="signal-badge ${senal.direction === 'LONG' ? 'badge-long' : 'badge-short'}">${senal.action}</span>
+      <span class="signal-badge ${badgeClass}">${badgeText}</span>
     </div>
+    
     <div class="signal-execute">
       <div class="exec-grid">
         <div class="exec-field">
@@ -963,12 +964,17 @@ function buildSignalCard(text, senal) {
         <button class="exec-btn-short" onclick="ejecutar('${sym}','${uid}','SHORT')">▼ ENTRAR SHORT</button>
       </div>
     </div>
+    
+    ${analysisHtml ? `
+    <div class="analysis-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent = this.nextElementSibling.classList.contains('show') ? '▲ Ocultar analisis' : '▼ Ver analisis completo';">▼ Ver analisis completo</div>
+    <div class="analysis-content">${analysisHtml}</div>
+    ` : ''}
+
   </div>`;
   
   return html;
 }
 
-// Cambiar tipo de orden visualmente
 function setOT(sym, uid, type) {
   document.getElementById('exec-market-' + uid).classList.remove('sel-market');
   document.getElementById('exec-limit-' + uid).classList.remove('sel-limit');
@@ -979,7 +985,6 @@ function setOT(sym, uid, type) {
   }
 }
 
-// Ejecutar la orden Multi-TP
 function ejecutar(sym, uid, side) {
   var usdt = getVal('exec-usdt-' + uid);
   var entry = getVal('exec-entry-' + uid);
@@ -1035,7 +1040,6 @@ function ejecutar(sym, uid, side) {
   .catch(e => showToast('Error de red', 'error'));
 }
 
-// Comunicacion con Anthropic Claude
 function enviarMensaje(msg) {
   var ak = document.getElementById('anthropicKey').value.trim();
   if (!ak) return showToast('Introduce Anthropic API Key', 'error');
@@ -1043,7 +1047,7 @@ function enviarMensaje(msg) {
   var chat = document.getElementById('chatArea');
   chat.innerHTML += `<div class="msg msg-user"><div class="msg-bubble-user">${msg}</div></div>`;
   
-  var sp = 'Eres CryptoAdvisor. Analiza CUALQUIER criptomoneda. Metodologia SMC. \n\nREGLA: Usa punto para decimales. Indica gestion de TPs así: "Gestion: 40% TP1 30% TP2 30% TP3".\n\nREGLAS DE COHERENCIA:\n1. SHORT: SL MAYOR que Entrada. TPs MENORES que Entrada.\n2. LONG: SL MENOR que Entrada. TPs MAYORES que Entrada.\n\nFORMATO:\nANALISIS [ACTIVO] | $[PRECIO]\n[...resto del analisis...]\nEntrada: $[precio]\nStop Loss: $[precio]\nTP1: $[precio]\nTP2: $[precio]\nTP3: $[precio]\nGestion: [X]% TP1 [Y]% TP2 [Z]% TP3\nAccion: COMPRAR/VENDER/ESPERAR';
+  var sp = 'Eres CryptoAdvisor. Analiza CUALQUIER criptomoneda. Metodologia SMC. \n\nREGLA: Usa punto para decimales. Indica gestion de TPs así: "Gestion: 40% TP1 30% TP2 30% TP3".\n\nREGLAS DE COHERENCIA:\n1. SHORT: SL MAYOR que Entrada. TPs MENORES que Entrada.\n2. LONG: SL MENOR que Entrada. TPs MAYORES que Entrada.\n\nFORMATO:\nANALISIS [ACTIVO] | $[PRECIO]\n[...resto del analisis...]\nEntrada: $[precio]\nStop Loss: $[precio]\nTP1: $[precio]\nTP2: $[precio]\nTP3: $[precio]\nGestion: [X]% TP1 [Y]% TP2 [Z]% TP3\nEstructura: ALCISTA / BAJISTA / RANGO\nSesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\nConfianza: [X]/10\nRazon: [breve razon de la entrada]\nAccion: COMPRAR/VENDER/ESPERAR';
 
   conversationHistory.push({ role: 'user', content: msg });
   
