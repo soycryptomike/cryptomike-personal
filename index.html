@@ -444,7 +444,8 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
   var precio = prices[sym] || entradaFinal;
   if (!precio) { showToast('Precio no disponible', 'error'); return; }
 
-  var ot = document.querySelector('.exec-type-btn.sel-market, .exec-type-btn.sel-limit, .exec-type-btn.sel-stop');
+  // CORRECCIÓN 1: Ahora busca específicamente el botón de la tarjeta actual, no de toda la página
+  var ot = document.querySelector('#exec-types-' + sym + ' .sel-market, #exec-types-' + sym + ' .sel-limit, #exec-types-' + sym + ' .sel-stop');
   if (ot) {
     if (ot.classList.contains('sel-market')) orderType = 'market';
     else if (ot.classList.contains('sel-limit')) orderType = 'limit';
@@ -459,10 +460,15 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
     bitunixReq('leverage', { symbol: sym + 'USDT', leverage: lev }).then(function() {
       showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
       var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
+      
+      // Se asegura de enviar el tipo y el precio exacto
       if (orderType === 'limit' || orderType === 'stop') {
         orderBody.orderType = orderType === 'limit' ? 'LIMIT' : 'STOP';
         orderBody.price = entradaFinal;
+      } else {
+        orderBody.orderType = 'MARKET';
       }
+      
       return bitunixReq('order', orderBody);
     }).then(function(res) {
       mostrarResultadoOrden(res && res.code === 0, side, sym, usdt, precioEjecucion, slFinal, tpFinal, lev, orderType, res ? res.msg : 'Error');
@@ -472,7 +478,18 @@ function ejecutarDesdeCard(sym, side, entrada, sl, tp, leverage, orderType) {
     var size = Math.floor(usdt * lev / precioEjecucion);
     bitmartReq('leverage', { symbol: sym + '_USDT', leverage: lev, openType: 'isolated' }).then(function() {
       showToast('Enviando orden ' + orderType + ' a BitMart...', '');
-      return bitmartReq('order', { symbol: sym + '_USDT', side: side, size: size, sl: slFinal, tp: tpFinal });
+      
+      var orderBody = { symbol: sym + '_USDT', side: side, size: size, sl: slFinal, tp: tpFinal };
+      
+      // CORRECCIÓN 2: Ahora se le manda a BitMart el tipo de orden y el precio si es limit/stop
+      if (orderType === 'limit' || orderType === 'stop') {
+        orderBody.type = orderType;
+        orderBody.price = entradaFinal;
+      } else {
+        orderBody.type = 'market';
+      }
+      
+      return bitmartReq('order', orderBody);
     }).then(function(res) {
       mostrarResultadoOrden(res && res.code === 1000, side, sym, usdt, precioEjecucion, slFinal, tpFinal, lev, orderType, res ? res.message : 'Error');
       fetchPositions();
