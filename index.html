@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CryptoMike Personal Trader</title>
+<title>BOT_CM trading</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
@@ -79,7 +79,7 @@ body {
 }
 .login-info { font-size: 11px; color: var(--text3); margin-top: 16px; line-height: 1.6; font-family: 'Space Mono', monospace; }
 
-/* ═════ APLICACIÓN PRINCIPAL (OCULTA HASTA LOGIN) ═════ */
+/* ═════ APLICACIÓN PRINCIPAL ═════ */
 .app-screen { display: none; } 
 
 .header {
@@ -90,9 +90,9 @@ body {
 
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-mark {
-  width: 30px; height: 30px; background: var(--accent); border-radius: 7px;
+  width: 30px; height: 30px; background: var(--surface2); border: 1px solid rgba(200, 241, 53, 0.3); border-radius: 7px;
   display: flex; align-items: center; justify-content: center; font-weight: 700;
-  font-size: 13px; color: #0a0a0f; font-family: 'Space Mono', monospace;
+  font-size: 13px; color: #0a0a0f; font-family: 'Space Mono', monospace; overflow: hidden;
 }
 .logo-text { font-size: 14px; font-weight: 600; }
 .logo-sub { font-size: 10px; color: var(--text3); font-family: 'Space Mono', monospace; }
@@ -167,8 +167,20 @@ body {
 .pos-detail { font-size: 11px; color: var(--text2); font-family: 'Space Mono', monospace; line-height: 1.6; }
 .pos-pnl { font-size: 14px; font-weight: 600; font-family: 'Space Mono', monospace; margin-top: 4px; }
 
-/* CHAT AREA */
+/* CHAT AREA Y BIENVENIDA */
 .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+.welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+.welcome-logo { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; margin: 0 auto 15px; border: 2px solid var(--accent); background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; }
+.welcome-logo img { width: 100%; height: 100%; object-fit: cover; }
+.welcome h2 { font-size: 22px; color: var(--accent); font-weight: 700; margin-bottom: 15px; letter-spacing: 0.5px; }
+.welcome-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; max-width: 450px; text-align: left; margin: 0 auto 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+.welcome-feature { font-size: 13px; color: var(--text); margin-bottom: 12px; display: flex; gap: 10px; line-height: 1.5; }
+.welcome-feature span:first-child { color: var(--accent); flex-shrink: 0; }
+.welcome-feature:last-child { margin-bottom: 0; }
+.welcome-cmds { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.welcome-cmd { background: var(--surface2); border: 1px solid rgba(200, 241, 53, .2); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-family: 'Space Mono', monospace; color: var(--accent); cursor: pointer; }
+.welcome-cmd:hover { background: rgba(200, 241, 53, .1); }
+
 .msg { display: flex; flex-direction: column; gap: 4px; }
 .msg-user { align-items: flex-end; }
 .msg-ai { align-items: flex-start; }
@@ -244,9 +256,11 @@ body {
 
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="login-logo">CM</div>
-    <div class="login-title">CryptoMike VIP</div>
-    <div class="login-sub">Asesor de Trading con IA</div>
+    <div class="login-logo">
+      <img src="https://raw.githubusercontent.com/soycryptomike/cryptomike-advisor/main/logo.png" alt="CM" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
+    </div>
+    <div class="login-title">BOT_CM trading</div>
+    <div class="login-sub">Asesor de Trading VIP</div>
     
     <div class="login-field">
       <label>Exchange que usas</label>
@@ -275,9 +289,11 @@ body {
 <div class="app-screen" id="appScreen">
   <header class="header">
     <div class="logo">
-      <div class="logo-mark">CM</div>
+      <div class="logo-mark">
+        <img src="https://raw.githubusercontent.com/soycryptomike/cryptomike-advisor/main/logo.png" alt="CM" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
+      </div>
       <div>
-        <div class="logo-text">CryptoMike Trader</div>
+        <div class="logo-text">BOT_CM trading</div>
         <div class="logo-sub">uso personal · IA conversacional</div>
       </div>
     </div>
@@ -367,9 +383,27 @@ body {
     <div class="content">
       <div class="chat-area" id="chatArea">
         <div class="welcome" id="welcome">
-          <div class="welcome-icon">⚡</div>
-          <h2>CryptoMike Personal Trader</h2>
-          <p>Analiza, compara activos o chatea con la IA libremente. Recibe señales estructuradas y ejecuta órdenes Límite o Mercado.</p>
+          <div class="welcome-logo">
+            <img src="https://raw.githubusercontent.com/soycryptomike/cryptomike-advisor/main/logo.png" alt="CM Logo" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
+          </div>
+          <h2>BOT_CM trading</h2>
+          
+          <div class="welcome-card">
+            <div class="welcome-feature">
+              <span>⚡</span>
+              <span><b>IA Conversacional:</b> Pídele análisis SMC completos, compara proyectos (ej. XRP vs XLM) o consúltale dudas del mercado.</span>
+            </div>
+            <div class="welcome-feature">
+              <span>🎯</span>
+              <span><b>Multi-TP Automático:</b> Configura hasta 3 Take Profits porcentuales y deja que el bot divida la orden en tu exchange.</span>
+            </div>
+            <div class="welcome-feature">
+              <span>📱</span>
+              <span><b>Alertas en Telegram:</b> Recibe notificaciones privadas al instante cada vez que el sistema ejecute una operativa.</span>
+            </div>
+          </div>
+
+          <p style="font-size:12px; color:var(--text3); margin-bottom:12px;">Selecciona un comando rápido o escríbele a la IA para empezar:</p>
           <div class="welcome-cmds">
             <div class="welcome-cmd" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
             <div class="welcome-cmd" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
@@ -435,7 +469,6 @@ function doLogin() {
     btn.disabled = false;
     btn.textContent = 'Acceder';
   }).catch(function(e) {
-    // Si Render tarda más de 30 segundos, lanzamos este error.
     showLoginError('El servidor de Render está iniciando. Espera 10 segundos y vuelve a darle a Acceder.');
     btn.disabled = false;
     btn.textContent = 'Acceder';
