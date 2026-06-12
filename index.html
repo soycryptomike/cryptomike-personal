@@ -21,7 +21,6 @@
   --up: #4ade80;
   --down: #f87171;
   --warn: #fbbf24;
-  --gold: #FFD700;
   --radius: 12px;
   --radius-sm: 8px;
 }
@@ -35,102 +34,110 @@ body {
   min-height: 100vh;
 }
 
+/* ═════ PANTALLA DE LOGIN (OVERLAY) ═════ */
+.login-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
+  background: radial-gradient(ellipse at center, #1a1a0f 0%, #0a0a0f 70%);
+}
+.login-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 420px;
+  text-align: center; box-shadow: 0 0 60px rgba(200, 241, 53, 0.05);
+}
+.login-logo {
+  width: 100px; height: 100px; margin: 0 auto 20px;
+  border-radius: 50%; overflow: hidden; border: 2px solid rgba(200, 241, 53, 0.3);
+  background: var(--surface2); display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size: 32px; color:var(--accent); font-family: 'Space Mono', monospace;
+}
+.login-title { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.login-sub { font-size: 13px; color: var(--text3); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
+
+.login-field { margin-bottom: 14px; text-align: left; }
+.login-field label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 5px; font-family: 'Space Mono', monospace; text-transform: uppercase; }
+.login-field input, .login-field select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 11px 14px; color: var(--text);
+  font-size: 14px; outline: none; font-family: 'Space Grotesk', sans-serif;
+}
+.login-field input:focus, .login-field select:focus { border-color: var(--accent); }
+.login-field input::placeholder { color: var(--text3); }
+
+.login-btn {
+  width: 100%; padding: 13px; background: var(--accent); border: none;
+  border-radius: var(--radius-sm); color: #0a0a0f; font-size: 15px;
+  font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity 0.2s;
+}
+.login-btn:hover { opacity: .9; }
+.login-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.login-error {
+  background: rgba(248, 113, 113, .1); border: 1px solid rgba(248, 113, 113, .3);
+  border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px;
+  color: #f87171; margin-top: 12px; display: none;
+}
+.login-info { font-size: 11px; color: var(--text3); margin-top: 16px; line-height: 1.6; font-family: 'Space Mono', monospace; }
+
+/* ═════ APLICACIÓN PRINCIPAL (OCULTA HASTA LOGIN) ═════ */
+.app-screen { display: none; } 
+
 .header {
   border-bottom: 1px solid var(--border);
-  padding: 14px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  background: rgba(10, 10, 15, 0.97);
-  backdrop-filter: blur(12px);
-  z-index: 100;
+  padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: rgba(10, 10, 15, 0.97); backdrop-filter: blur(12px); z-index: 100;
 }
 
 .logo { display: flex; align-items: center; gap: 10px; }
-
 .logo-mark {
-  width: 30px; height: 30px;
-  background: var(--accent);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 13px;
-  color: #0a0a0f; font-family: 'Space Mono', monospace;
+  width: 30px; height: 30px; background: var(--accent); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+  font-size: 13px; color: #0a0a0f; font-family: 'Space Mono', monospace;
 }
-
 .logo-text { font-size: 14px; font-weight: 600; }
 .logo-sub { font-size: 10px; color: var(--text3); font-family: 'Space Mono', monospace; }
 
-.status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--text3);
-  display: inline-block;
-  margin-right: 5px;
-}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); display: inline-block; margin-right: 5px; }
 .status-dot.live { background: var(--up); box-shadow: 0 0 6px var(--up); }
 .status-text { font-size: 11px; color: var(--text3); font-family: 'Space Mono', monospace; }
+
+.logout-btn {
+  font-size: 10px; color: var(--text2); cursor: pointer; padding: 4px 8px;
+  border: 1px solid var(--border2); border-radius: 4px; font-family: 'Space Mono', monospace;
+  transition: all 0.2s;
+}
+.logout-btn:hover { color: var(--down); border-color: var(--down); }
 
 .main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 61px); }
 
 .sidebar {
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
-  display: flex; flex-direction: column;
-  background: var(--bg);
-  z-index: 90;
+  border-right: 1px solid var(--border); overflow-y: auto; display: flex;
+  flex-direction: column; background: var(--bg); z-index: 90;
 }
-
 .content { display: flex; flex-direction: column; overflow: hidden; }
 
-.s-label {
-  font-size: 10px; font-weight: 600; color: var(--text3);
-  letter-spacing: .12em; text-transform: uppercase; padding: 16px 16px 8px;
-}
+.s-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: .12em; text-transform: uppercase; padding: 16px 16px 8px; }
 .s-block { padding: 0 14px 14px; border-bottom: 1px solid var(--border); }
 
 .field { margin-bottom: 8px; }
 .field label { font-size: 10px; color: var(--text2); display: block; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
-.field input, .field select {
-  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: var(--radius-sm); padding: 7px 10px; color: var(--text);
-  font-size: 12px; font-family: 'Space Mono', monospace; outline: none;
-}
+.field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 7px 10px; color: var(--text); font-size: 12px; font-family: 'Space Mono', monospace; outline: none; }
 .field input:focus, .field select:focus { border-color: var(--accent); }
-.field input::placeholder { color: var(--text3); }
 
 .exchange-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-.exch-btn {
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: var(--radius-sm); padding: 8px; cursor: pointer;
-  font-size: 12px; font-weight: 600; font-family: 'Space Mono', monospace;
-  color: var(--text3); text-align: center;
-}
+.exch-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 8px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Space Mono', monospace; color: var(--text3); text-align: center; }
 .exch-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200, 241, 53, .06); }
+.api-panel { display: none; } .api-panel.active { display: block; }
 
-.api-panel { display: none; }
-.api-panel.active { display: block; }
-
-.btn {
-  width: 100%; padding: 8px; border-radius: var(--radius-sm); border: none;
-  cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Space Grotesk', sans-serif;
-}
+.btn { width: 100%; padding: 8px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
 .btn-accent { background: var(--accent); color: #0a0a0f; }
 .btn-accent:hover { background: var(--accent2); }
 
 .cmd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-.cmd-btn {
-  background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm);
-  padding: 7px 5px; cursor: pointer; font-size: 10px; font-family: 'Space Mono', monospace;
-  color: var(--text2); text-align: center; display: flex; align-items: center; justify-content: center;
-}
+.cmd-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 7px 5px; cursor: pointer; font-size: 10px; font-family: 'Space Mono', monospace; color: var(--text2); text-align: center; display: flex; align-items: center; justify-content: center; }
 .cmd-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-.up { color: var(--up); }
-.down { color: var(--down); }
-.warn { color: var(--warn); }
-.neutral { color: var(--text3); }
+.up { color: var(--up); } .down { color: var(--down); } .warn { color: var(--warn); } .neutral { color: var(--text3); }
 
 /* EJECUCION DENTRO DE CARD */
 .signal-execute { padding: 14px 18px; border-top: 1px solid var(--border2); background: rgba(200, 241, 53, .02); }
@@ -235,115 +242,151 @@ body {
 </head>
 <body>
 
-<header class="header">
-  <div class="logo">
-    <div class="logo-mark">CM</div>
-    <div>
-      <div class="logo-text">CryptoMike Trader</div>
-      <div class="logo-sub">uso personal · IA conversacional</div>
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">CM</div>
+    <div class="login-title">CryptoMike VIP</div>
+    <div class="login-sub">Asesor de Trading con IA</div>
+    
+    <div class="login-field">
+      <label>Exchange que usas</label>
+      <select id="loginExchange">
+        <option value="Bitunix">Bitunix</option>
+        <option value="BitMart">BitMart</option>
+      </select>
     </div>
-  </div>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <div id="exchBadge" class="exch-badge" style="display:none"></div>
-    <div><span class="status-dot" id="statusDot"></span><span class="status-text" id="statusText">sin conectar</span></div>
-  </div>
-</header>
-
-<div class="main">
-  <aside class="sidebar">
-    <div class="tabs">
-      <div class="tab" onclick="sideTab(this,'tab-config')">Config</div>
-      <div class="tab active" onclick="sideTab(this,'tab-analisis')">Comandos</div>
-      <div class="tab" onclick="sideTab(this,'tab-posiciones')">Posiciones</div>
+    
+    <div class="login-field">
+      <label>Tu UID del exchange</label>
+      <input type="text" id="loginUid" placeholder="Introduce tu UID..." />
     </div>
+    
+    <div class="login-field">
+      <label>Contraseña VIP</label>
+      <input type="password" id="loginPassword" placeholder="Contraseña de la quincena..." onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    
+    <button class="login-btn" onclick="doLogin()" id="loginBtn">Acceder</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-info">La contraseña cambia cada 15 días. Revísala en el canal VIP de Telegram.</div>
+  </div>
+</div>
 
-    <div id="tab-config" class="tab-panel">
-      <div class="s-block" style="padding-top:10px;">
-        <div class="field">
-          <label>TELEGRAM CHAT ID (Alertas)</label>
-          <input type="text" id="telegramId" placeholder="Ej: 828991968" />
-          <div style="font-size:9px; color:var(--text3); margin-top:4px; font-family:'Space Mono', monospace;">
-            ¿No sabes tu ID? <a href="https://t.me/userinfobot" target="_blank" style="color:var(--accent); text-decoration:none;">Descúbrelo aquí</a>
+<div class="app-screen" id="appScreen">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark">CM</div>
+      <div>
+        <div class="logo-text">CryptoMike Trader</div>
+        <div class="logo-sub">uso personal · IA conversacional</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div id="exchBadge" class="exch-badge" style="display:none"></div>
+      <div><span class="status-dot" id="statusDot"></span><span class="status-text" id="statusText">sin conectar</span></div>
+      <div class="logout-btn" onclick="doLogout()">Salir</div>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="sidebar">
+      <div class="tabs">
+        <div class="tab" onclick="sideTab(this,'tab-config')">Config</div>
+        <div class="tab active" onclick="sideTab(this,'tab-analisis')">Comandos</div>
+        <div class="tab" onclick="sideTab(this,'tab-posiciones')">Posiciones</div>
+      </div>
+
+      <div id="tab-config" class="tab-panel">
+        <div class="s-block" style="padding-top:10px;">
+          <div class="field">
+            <label>TELEGRAM CHAT ID (Alertas)</label>
+            <input type="text" id="telegramId" placeholder="Ej: 828991968" />
+            <div style="font-size:9px; color:var(--text3); margin-top:4px; font-family:'Space Mono', monospace;">
+              ¿No sabes tu ID? <a href="https://t.me/userinfobot" target="_blank" style="color:var(--accent); text-decoration:none;">Descúbrelo aquí</a>
+            </div>
+          </div>
+          <div class="field"><label>ANTHROPIC API KEY</label><input type="password" id="anthropicKey" placeholder="sk-ant-..." /></div>
+          
+          <div class="exchange-selector">
+            <div class="exch-btn active" id="btnBitunix" onclick="selectExchange('bitunix')">Bitunix</div>
+            <div class="exch-btn" id="btnBitmart" onclick="selectExchange('bitmart')">BitMart</div>
+          </div>
+          
+          <div class="api-panel active" id="panel-bitunix">
+            <div class="field"><input type="password" id="bitunixKey" placeholder="API Key..." /></div>
+            <div class="field"><input type="password" id="bitunixSecret" placeholder="Secret Key..." /></div>
+          </div>
+          <div class="api-panel" id="panel-bitmart">
+            <div class="field"><input type="password" id="bitmartKey" placeholder="API Key..." /></div>
+            <div class="field"><input type="password" id="bitmartSecret" placeholder="Secret Key..." /></div>
+            <div class="field"><input type="text" id="bitmartMemo" placeholder="Memo..." /></div>
+          </div>
+          
+          <button class="btn btn-accent" onclick="conectar()">Conectar Sistema</button>
+        </div>
+      </div>
+
+      <div id="tab-analisis" class="tab-panel active">
+        <div class="s-block" style="padding-top:10px;">
+          <div style="font-size:10px; color:var(--text2); margin-bottom:8px; font-family:'Space Mono', monospace;">TUS FAVORITOS</div>
+          <div class="cmd-grid">
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA ORO</div>
+          </div>
+          
+          <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">TOP CRYPTO</div>
+          <div class="cmd-grid">
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA BNB')">ANALIZA BNB</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA ADA')">ANALIZA ADA</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA DOGE')">ANALIZA DOGE</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA AVAX')">ANALIZA AVAX</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA LINK')">ANALIZA LINK</div>
+          </div>
+
+          <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">CHAT & COMPARATIVAS</div>
+          <div class="cmd-grid" style="grid-template-columns: 1fr;">
+            <div class="cmd-btn" onclick="sendCmd('XRP vs XLM comparativa rapida. ¿En cual es mejor entrar ahora? Dame operativa del ganador.')">XRP vs XLM ¿Cual es mejor?</div>
+            <div class="cmd-btn" onclick="sendCmd('SOL vs ETH. Compara fundamentales y dame un setup de la que tenga mejor estructura.')">SOL vs ETH (Setup)</div>
+            <div class="cmd-btn" onclick="sendCmd('Analiza BTC y dime si afectara a mis operativas de hoy.')">Impacto de BTC en Altcoins</div>
           </div>
         </div>
-        <div class="field"><label>ANTHROPIC API KEY</label><input type="password" id="anthropicKey" placeholder="sk-ant-..." /></div>
-        <div class="exchange-selector">
-          <div class="exch-btn active" id="btnBitunix" onclick="selectExchange('bitunix')">Bitunix</div>
-          <div class="exch-btn" id="btnBitmart" onclick="selectExchange('bitmart')">BitMart</div>
-        </div>
-        <div class="api-panel active" id="panel-bitunix">
-          <div class="field"><input type="password" id="bitunixKey" placeholder="API Key..." /></div>
-          <div class="field"><input type="password" id="bitunixSecret" placeholder="Secret Key..." /></div>
-        </div>
-        <div class="api-panel" id="panel-bitmart">
-          <div class="field"><input type="password" id="bitmartKey" placeholder="API Key..." /></div>
-          <div class="field"><input type="password" id="bitmartSecret" placeholder="Secret Key..." /></div>
-          <div class="field"><input type="text" id="bitmartMemo" placeholder="Memo..." /></div>
-        </div>
-        <button class="btn btn-accent" onclick="conectar()">Conectar Sistema</button>
       </div>
-    </div>
 
-    <div id="tab-analisis" class="tab-panel active">
-      <div class="s-block" style="padding-top:10px;">
-        <div style="font-size:10px; color:var(--text2); margin-bottom:8px; font-family:'Space Mono', monospace;">TUS FAVORITOS</div>
-        <div class="cmd-grid">
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA ORO</div>
-        </div>
-        
-        <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">TOP CRYPTO</div>
-        <div class="cmd-grid">
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA BNB')">ANALIZA BNB</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA ADA')">ANALIZA ADA</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA DOGE')">ANALIZA DOGE</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA AVAX')">ANALIZA AVAX</div>
-          <div class="cmd-btn" onclick="sendCmd('ANALIZA LINK')">ANALIZA LINK</div>
-        </div>
-
-        <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">CHAT & COMPARATIVAS</div>
-        <div class="cmd-grid" style="grid-template-columns: 1fr;">
-          <div class="cmd-btn" onclick="sendCmd('XRP vs XLM comparativa rapida. ¿En cual es mejor entrar ahora? Dame operativa del ganador.')">XRP vs XLM ¿Cual es mejor?</div>
-          <div class="cmd-btn" onclick="sendCmd('SOL vs ETH. Compara fundamentales y dame un setup de la que tenga mejor estructura.')">SOL vs ETH (Setup)</div>
-          <div class="cmd-btn" onclick="sendCmd('Analiza BTC y dime si afectara a mis operativas de hoy.')">Impacto de BTC en Altcoins</div>
+      <div id="tab-posiciones" class="tab-panel">
+        <div class="s-block" id="posicionesContainer" style="padding-top:10px;font-size:12px;text-align:center;color:var(--text3);">
+          Sin posiciones abiertas
         </div>
       </div>
-    </div>
+    </aside>
 
-    <div id="tab-posiciones" class="tab-panel">
-      <div class="s-block" id="posicionesContainer" style="padding-top:10px;font-size:12px;text-align:center;color:var(--text3);">
-        Sin posiciones abiertas
-      </div>
-    </div>
-  </aside>
-
-  <div class="content">
-    <div class="chat-area" id="chatArea">
-      <div class="welcome" id="welcome">
-        <div class="welcome-icon">⚡</div>
-        <h2>CryptoMike Personal Trader</h2>
-        <p>Analiza, compara activos o chatea con la IA libremente. Recibe señales estructuradas y ejecuta órdenes Límite o Mercado.</p>
-        <div class="welcome-cmds">
-          <div class="welcome-cmd" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
-          <div class="welcome-cmd" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
-          <div class="welcome-cmd" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
-          <div class="welcome-cmd" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA ORO</div>
+    <div class="content">
+      <div class="chat-area" id="chatArea">
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">⚡</div>
+          <h2>CryptoMike Personal Trader</h2>
+          <p>Analiza, compara activos o chatea con la IA libremente. Recibe señales estructuradas y ejecuta órdenes Límite o Mercado.</p>
+          <div class="welcome-cmds">
+            <div class="welcome-cmd" onclick="sendCmd('ANALIZA XRP')">ANALIZA XRP</div>
+            <div class="welcome-cmd" onclick="sendCmd('ANALIZA XLM')">ANALIZA XLM</div>
+            <div class="welcome-cmd" onclick="sendCmd('ANALIZA HBAR')">ANALIZA HBAR</div>
+            <div class="welcome-cmd" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA ORO</div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="input-area">
-      <div class="input-row">
-        <div class="input-wrap">
-          <input type="text" id="userInput" placeholder="Ej: Analiza XRP o hazle una pregunta..." onkeydown="if(event.key==='Enter')enviar()" />
+      <div class="input-area">
+        <div class="input-row">
+          <div class="input-wrap">
+            <input type="text" id="userInput" placeholder="Ej: Analiza XRP o hazle una pregunta..." onkeydown="if(event.key==='Enter')enviar()" />
+          </div>
+          <button class="send-btn" id="sendBtn" onclick="enviar()">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
         </div>
-        <button class="send-btn" id="sendBtn" onclick="enviar()">
-          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        </button>
       </div>
     </div>
   </div>
@@ -358,6 +401,63 @@ var prices = { XLM: 0, XRP: 0, HBAR: 0, BTC: 0, ETH: 0, SOL: 0, XAUUSDT: 0 };
 var priceInterval = null;
 var activeExchange = 'bitunix';
 
+// ═════ FUNCIONES DE LOGIN ═════
+function doLogin() {
+  var uid = document.getElementById('loginUid').value.trim();
+  var password = document.getElementById('loginPassword').value.trim();
+  var exchange = document.getElementById('loginExchange').value;
+  var btn = document.getElementById('loginBtn');
+  var errorEl = document.getElementById('loginError');
+
+  if (!uid) { showLoginError('Introduce tu UID del exchange'); return; }
+  if (!password) { showLoginError('Introduce la contraseña VIP'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Despertando servidor y Verificando...';
+  errorEl.style.display = 'none';
+
+  fetch(RENDER_SERVER + '/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid: uid, password: password, exchange: exchange })
+  }).then(function(r) {
+    return r.json();
+  }).then(function(data) {
+    if (data.success) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appScreen').style.display = 'block';
+      
+      selectExchange(exchange.toLowerCase());
+      showToast('Bienvenido. Contraseña válida ' + data.daysUntilExpiry + ' días más.', 'success');
+    } else {
+      showLoginError(data.error || 'Contraseña incorrecta. Obténla en el canal VIP.');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Acceder';
+  }).catch(function(e) {
+    // Si Render tarda más de 30 segundos, lanzamos este error.
+    showLoginError('El servidor de Render está iniciando. Espera 10 segundos y vuelve a darle a Acceder.');
+    btn.disabled = false;
+    btn.textContent = 'Acceder';
+  });
+}
+
+function showLoginError(msg) {
+  var el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPassword').value = '';
+  if (priceInterval) clearInterval(priceInterval);
+  document.getElementById('statusDot').classList.remove('live');
+  document.getElementById('statusText').textContent = 'sin conectar';
+}
+
+// ═════ UTILIDADES GLOBALES ═════
 function getVal(id) { 
   var el = document.getElementById(id); 
   return el && el.value ? parseFloat(el.value.replace(/,/g, '.')) : 0; 
@@ -366,8 +466,10 @@ function getVal(id) {
 function selectExchange(ex) {
   activeExchange = ex;
   ['bitunix', 'bitmart'].forEach(function(e) {
-    document.getElementById('btn' + e.charAt(0).toUpperCase() + e.slice(1)).classList.toggle('active', e === ex);
-    document.getElementById('panel-' + e).classList.toggle('active', e === ex);
+    var btn = document.getElementById('btn' + e.charAt(0).toUpperCase() + e.slice(1));
+    var panel = document.getElementById('panel-' + e);
+    if(btn) btn.classList.toggle('active', e === ex);
+    if(panel) panel.classList.toggle('active', e === ex);
   });
 }
 
@@ -441,7 +543,6 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
-// ═════ CORRECCIÓN DEFINITIVA DE ORDEN LIMIT ═════
 function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType) {
   var usdt = getVal('exec-usdt-' + uid);
   var entradaFinal = getVal('exec-entry-' + uid) || entrada;
@@ -472,7 +573,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
       showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
       var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
       
-      // SOLUCIÓN: Mandamos 'limit' o 'market' en minúsculas para que el servidor lo procese correctamente
       if (orderType === 'limit') {
         orderBody.orderType = 'limit'; 
         orderBody.price = entradaFinal;
@@ -579,7 +679,6 @@ function sendCmd(cmd) {
   enviar(); 
 }
 
-// ═════ EL NUEVO CEREBRO INTELIGENTE DE CHAT ═════
 function enviar() {
   var input = document.getElementById('userInput');
   var userText = input.value.trim();
@@ -593,7 +692,6 @@ function enviar() {
 
   setLoading(true);
 
-  // El sistema rastrea cualquier mención a criptomonedas en tu mensaje
   var words = userText.toUpperCase().replace(/[.,?¿!¡]/g, '').split(' ');
   var syms = [];
   var ignore = ['QUE','POR','CON','LAS','LOS','DEL','UNA','UNO','MAS','MUY','SON','SIN','HAY','AQUI','ESTA','ESTE','ESO','ESE','ASI','CUAL','MEJOR','ANALIZA','SETUP','FUNDAMENTAL','COMPARA','ENTRAR','AHORA','PARA','DAME','COSA','SOLO','AL','EL','LA','EN','UN','SI','NO','Y','O'];
@@ -606,7 +704,6 @@ function enviar() {
   });
   syms = [...new Set(syms)];
   
-  // Busca sus precios reales en vivo de forma simultanea
   var fetchPromises = syms.map(sym => {
     var cleanSym = sym === 'ORO' ? 'XAUUSDT' : sym;
     if (cleanSym === 'XAUUSDT') sym = 'XAUUSDT';
@@ -620,7 +717,6 @@ function enviar() {
     return Promise.resolve();
   });
 
-  // Cuando tiene todos los datos reales, se los inyecta a Claude de forma invisible
   Promise.all(fetchPromises).then(() => {
     var contextPrices = syms.filter(s => prices[s]).map(s => s + '=$' + prices[s].toFixed(5)).join(', ');
     var finalMsg = userText;
@@ -639,7 +735,6 @@ function llamarClaude(promptText) {
     return showToast('Introduce Anthropic API Key', 'error'); 
   }
   
-  // PROMPT MODIFICADO PARA COMPORTAMIENTO CHAT/ASESOR
   var sp = 'Eres CryptoAdvisor, asesor experto en trading. Analizas CUALQUIER criptomoneda (BTC, ETH, SOL, XRP, etc.) o Forex (XAUUSDT) en futuros perpetuos. Metodologia SMC/ICT. Riesgo 2%.\n\nREGLA VITAL DE FORMATO: Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n\nMODO DE RESPONDER:\n1. Si el usuario te hace una pregunta general, compara activos (ej: "XRP vs XLM") o pide consejos, ACTÚA COMO UN CHAT NATURAL. Razona con él, compara los fundamentales, la estructura, y dale una respuesta hablada.\n2. Si el usuario te pide una operativa explícita ("dame una operativa para...", "setup de...") o si durante tu análisis natural concluyes que hay una buena entrada, OBLIGATORIAMENTE debes incluir al FINAL de tu mensaje el siguiente formato exacto (para que el sistema dibuje la tarjeta):\n\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nSETUP OPERATIVO\n- Direccion: LONG / SHORT / ESPERAR\n- Entrada: $[precio]\n- Stop Loss: $[precio]\n- TP1: $[precio]\n- TP2: $[precio]\n- TP3: $[precio]\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Confianza: [X]/10\n- Razon: [breve explicacion de 1 linea]\n- Accion: COMPRAR / VENDER / ESPERAR\n==========================\n\nREGLAS LOGICAS ESTRICTAS:\n- SHORT: SL MAYOR que Entrada. TPs MENORES que Entrada.\n- LONG: SL MENOR que Entrada. TPs MAYORES que Entrada.';
 
   conversationHistory.push({ role: 'user', content: promptText });
@@ -689,7 +784,7 @@ function parsearSenal(text) {
     prices[data.asset] = data.price; 
   }
 
-  if (!data.asset) return data; // Si no hay tarjeta estructurada, no sigue parseando
+  if (!data.asset) return data;
 
   if (/\bLONG\b|COMPRAR/i.test(norm)) { data.direction = 'LONG'; data.action = 'COMPRAR'; } 
   else if (/\bSHORT\b|VENDER/i.test(norm)) { data.direction = 'SHORT'; data.action = 'VENDER'; } 
@@ -786,7 +881,6 @@ function buildSignalCard(text, senal, rawText) {
      if (senal.structure) analysisHtml += '<div class="signal-row"><span class="signal-key">Estructura</span><span class="signal-val ' + (senal.structure === 'ALCISTA' ? 'up' : senal.structure === 'BAJISTA' ? 'down' : 'warn') + '">' + senal.structure + '</span></div>';
      if (senal.sesgo) analysisHtml += '<div class="signal-row"><span class="signal-key">Fundamental</span><span class="signal-val ' + (senal.sesgo === 'ALCISTA' ? 'up' : senal.sesgo === 'BAJISTA' ? 'down' : 'neutral') + '">' + senal.sesgo + '</span></div>';
      if (senal.confidence) analysisHtml += '<div class="signal-row"><span class="signal-key">Confianza</span><span class="signal-val" style="color:var(--text)">' + senal.confidence + '/10</span></div>';
-     // Quitamos la etiqueta interna antes de mostrarla en la pantalla final
      var cleanText = rawText.replace(/\[INFO INTERNA DEL SISTEMA.*?\]/g, '').replace(/\*/g,'');
      analysisHtml += '<hr class="signal-divider"><div style="font-size:11px; color:var(--text2); line-height:1.6; white-space:pre-wrap;">' + cleanText + '</div>';
      analysisHtml += '</div>';
