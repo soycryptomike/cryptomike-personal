@@ -16,7 +16,7 @@
   --text: #f0f0f5;
   --text2: #9090a8;
   --text3: #5a5a70;
-  --accent: #FFC000; /* Dorado del logo */
+  --accent: #FFC000;
   --accent2: #DAA520;
   --up: #4ade80;
   --down: #f87171;
@@ -48,8 +48,10 @@ body {
 .login-logo {
   width: 100px; height: 100px; margin: 0 auto 20px;
   display:flex; align-items:center; justify-content:center;
+  border-radius: 50%; overflow: hidden; background: #ffffff;
+  border: 2px solid rgba(255, 192, 0, 0.3);
 }
-.login-logo svg { width: 100%; height: 100%; }
+.login-logo img { width: 100%; height: 100%; object-fit: contain; }
 
 .login-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
 .login-sub { font-size: 13px; color: var(--text3); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
@@ -91,8 +93,9 @@ body {
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-mark {
   width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  border-radius: 50%; background: #ffffff; border: 1px solid rgba(255, 192, 0, 0.3);
 }
-.logo-mark svg { width: 100%; height: 100%; }
+.logo-mark img { width: 100%; height: 100%; object-fit: contain; }
 
 .logo-text { font-size: 15px; font-weight: 700; color: var(--accent); }
 .logo-sub { font-size: 10px; color: var(--text3); font-family: 'Space Mono', monospace; }
@@ -170,8 +173,8 @@ body {
 /* CHAT AREA Y BIENVENIDA */
 .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
 .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
-.welcome-logo { width: 90px; height: 90px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; }
-.welcome-logo svg { width: 100%; height: 100%; }
+.welcome-logo { width: 90px; height: 90px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #ffffff; border: 2px solid var(--accent); overflow: hidden;}
+.welcome-logo img { width: 100%; height: 100%; object-fit: contain; }
 
 .welcome h2 { font-size: 24px; color: var(--accent); font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
 .welcome-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; max-width: 500px; text-align: left; margin: 0 auto 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -251,11 +254,6 @@ body {
   .header { padding: 10px 15px; }
   .logo-text { display: none; } 
 }
-
-/* ═════ SVG LOGO ESTILOS ═════ */
-.svg-logo {
-  width: 100%; height: 100%;
-}
 </style>
 </head>
 <body>
@@ -263,12 +261,7 @@ body {
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <svg class="svg-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <path d="M 20 70 L 20 30 L 50 50 L 80 30 L 80 70 L 65 55 L 65 45 L 50 60 L 35 45 L 35 55 Z" fill="#FFC000"/>
-        <rect x="25" y="60" width="6" height="20" fill="#FFC000" />
-        <rect x="47" y="70" width="6" height="20" fill="#FFC000" />
-        <rect x="69" y="55" width="6" height="20" fill="#FFC000" />
-      </svg>
+      <img src="logo.png" alt="CM Logo" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
     </div>
     <div class="login-title">BOT_CM trading</div>
     <div class="login-sub">Asesor de Trading VIP</div>
@@ -301,12 +294,7 @@ body {
   <header class="header">
     <div class="logo">
       <div class="logo-mark">
-        <svg class="svg-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 20 70 L 20 30 L 50 50 L 80 30 L 80 70 L 65 55 L 65 45 L 50 60 L 35 45 L 35 55 Z" fill="#0a0a0f"/>
-          <rect x="25" y="60" width="6" height="20" fill="#0a0a0f" />
-          <rect x="47" y="70" width="6" height="20" fill="#0a0a0f" />
-          <rect x="69" y="55" width="6" height="20" fill="#0a0a0f" />
-        </svg>
+        <img src="logo.png" alt="CM" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
       </div>
       <div>
         <div class="logo-text">BOT_CM trading</div>
@@ -400,12 +388,7 @@ body {
       <div class="chat-area" id="chatArea">
         <div class="welcome" id="welcome">
           <div class="welcome-logo">
-             <svg class="svg-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <path d="M 20 70 L 20 30 L 50 50 L 80 30 L 80 70 L 65 55 L 65 45 L 50 60 L 35 45 L 35 55 Z" fill="#FFC000"/>
-              <rect x="25" y="60" width="6" height="20" fill="#FFC000" />
-              <rect x="47" y="70" width="6" height="20" fill="#FFC000" />
-              <rect x="69" y="55" width="6" height="20" fill="#FFC000" />
-            </svg>
+            <img src="logo.png" alt="CM Logo" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
           </div>
           <h2>BOT_CM trading</h2>
           
@@ -835,7 +818,11 @@ function parsearSenal(text) {
     prices[data.asset] = data.price; 
   }
 
-  if (!data.asset) return data;
+  // AHORA NO RETORNA AUNQUE FALTE EL ASSET, DEJA QUE SIGA LEYENDO
+  if (!data.asset) {
+    var am = norm.match(/\b(BTC|ETH|SOL|XLM|XRP|HBAR|XAUUSDT|[A-Z]{3,8})\b/);
+    if (am) data.asset = am[1];
+  }
 
   if (/\bLONG\b|COMPRAR/i.test(norm)) { data.direction = 'LONG'; data.action = 'COMPRAR'; } 
   else if (/\bSHORT\b|VENDER/i.test(norm)) { data.direction = 'SHORT'; data.action = 'VENDER'; } 
@@ -879,6 +866,7 @@ function parsearSenal(text) {
 }
 
 function buildSignalCard(text, senal, rawText) {
+  // AHORA EL PANEL SALE SIEMPRE QUE HAYA UN ACTIVO, AUNQUE FALTEN DATOS
   if (!senal || !senal.asset) return null;
   
   var sym = senal.asset;
@@ -903,7 +891,7 @@ function buildSignalCard(text, senal, rawText) {
       </div>
     </div>`;
     
-  if (senal.tp2) {
+  if (senal.tp2 || senal.p2 > 0) {
     tpHtml += `
       <div class="exec-field">
         <label>TP2 $</label>
@@ -914,7 +902,7 @@ function buildSignalCard(text, senal, rawText) {
       </div>`;
   }
   
-  if (senal.tp3) {
+  if (senal.tp3 || senal.p3 > 0) {
     tpHtml += `
       <div class="exec-field">
         <label>TP3 $</label>
