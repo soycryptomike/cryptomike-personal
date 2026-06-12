@@ -16,7 +16,7 @@
   --text: #f0f0f5;
   --text2: #9090a8;
   --text3: #5a5a70;
-  --accent: #FFD700; /* Ajustado al amarillo de tu logo */
+  --accent: #FFC000; /* Dorado del logo */
   --accent2: #DAA520;
   --up: #4ade80;
   --down: #f87171;
@@ -43,13 +43,14 @@ body {
 .login-card {
   background: var(--surface); border: 1px solid var(--border2);
   border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 420px;
-  text-align: center; box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
+  text-align: center; box-shadow: 0 0 60px rgba(255, 192, 0, 0.05);
 }
 .login-logo {
-  width: 110px; height: 110px; margin: 0 auto 20px;
-  border-radius: 50%; overflow: hidden; border: 2px solid rgba(255, 215, 0, 0.3);
-  background: #ffffff; display:flex; align-items:center; justify-content:center;
+  width: 100px; height: 100px; margin: 0 auto 20px;
+  display:flex; align-items:center; justify-content:center;
 }
+.login-logo svg { width: 100%; height: 100%; }
+
 .login-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
 .login-sub { font-size: 13px; color: var(--text3); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
 
@@ -89,9 +90,10 @@ body {
 
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-mark {
-  width: 32px; height: 32px; background: #ffffff; border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+.logo-mark svg { width: 100%; height: 100%; }
+
 .logo-text { font-size: 15px; font-weight: 700; color: var(--accent); }
 .logo-sub { font-size: 10px; color: var(--text3); font-family: 'Space Mono', monospace; }
 
@@ -124,7 +126,7 @@ body {
 
 .exchange-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
 .exch-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 8px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Space Mono', monospace; color: var(--text3); text-align: center; }
-.exch-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255, 215, 0, .06); }
+.exch-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255, 192, 0, .06); }
 .api-panel { display: none; } .api-panel.active { display: block; }
 
 .btn { width: 100%; padding: 8px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
@@ -138,17 +140,17 @@ body {
 .up { color: var(--up); } .down { color: var(--down); } .warn { color: var(--warn); } .neutral { color: var(--text3); }
 
 /* EJECUCION DENTRO DE CARD */
-.signal-execute { padding: 14px 18px; border-top: 1px solid var(--border2); background: rgba(255, 215, 0, .02); }
+.signal-execute { padding: 14px 18px; border-top: 1px solid var(--border2); background: rgba(255, 192, 0, .02); }
 .signal-execute-title { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; font-family: 'Space Mono', monospace; }
 .exec-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .exec-field label { font-size: 9px; color: var(--text3); display: block; margin-bottom: 3px; font-family: 'Space Mono', monospace; }
 .exec-field input { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 6px; padding: 7px 8px; color: var(--text); font-size: 12px; font-family: 'Space Mono', monospace; outline: none; }
 .exec-field input:focus { border-color: var(--accent); }
 .tp-multi-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
-.tp-multi-row input.pct { width: 50px; text-align: center; background: rgba(255, 215, 0, .1); color: var(--accent); border-color: rgba(255, 215, 0, .3); }
+.tp-multi-row input.pct { width: 50px; text-align: center; background: rgba(255, 192, 0, .1); color: var(--accent); border-color: rgba(255, 192, 0, .3); }
 .exec-type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
 .exec-type-btn { padding: 7px 4px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace; text-align: center; border: 1px solid var(--border2); background: var(--bg); color: var(--text3); transition: all .15s; }
-.exec-type-btn.sel-market { border-color: var(--accent); color: var(--accent); background: rgba(255, 215, 0, .08); }
+.exec-type-btn.sel-market { border-color: var(--accent); color: var(--accent); background: rgba(255, 192, 0, .08); }
 .exec-type-btn.sel-limit { border-color: #00aae4; color: #00aae4; background: rgba(0, 170, 228, .08); }
 .exec-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .exec-btn-long { background: rgba(74, 222, 128, .15); color: var(--up); border: 1px solid rgba(74, 222, 128, .4); padding: 10px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; }
@@ -168,16 +170,17 @@ body {
 /* CHAT AREA Y BIENVENIDA */
 .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
 .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
-.welcome-logo { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; margin: 0 auto 15px; border: 2px solid var(--accent); background: #ffffff; display: flex; align-items: center; justify-content: center; }
-.welcome-logo img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+.welcome-logo { width: 90px; height: 90px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; }
+.welcome-logo svg { width: 100%; height: 100%; }
+
 .welcome h2 { font-size: 24px; color: var(--accent); font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
 .welcome-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; max-width: 500px; text-align: left; margin: 0 auto 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
 .welcome-feature { font-size: 13px; color: var(--text); margin-bottom: 16px; display: flex; gap: 12px; line-height: 1.5; }
 .welcome-feature span:first-child { font-size: 18px; flex-shrink: 0; }
 .welcome-feature:last-child { margin-bottom: 0; }
 .welcome-cmds { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-.welcome-cmd { background: var(--surface2); border: 1px solid rgba(255, 215, 0, .2); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-family: 'Space Mono', monospace; color: var(--accent); cursor: pointer; transition: background 0.2s; }
-.welcome-cmd:hover { background: rgba(255, 215, 0, .1); }
+.welcome-cmd { background: var(--surface2); border: 1px solid rgba(255, 192, 0, .2); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-family: 'Space Mono', monospace; color: var(--accent); cursor: pointer; transition: background 0.2s; }
+.welcome-cmd:hover { background: rgba(255, 192, 0, .1); }
 
 .msg { display: flex; flex-direction: column; gap: 4px; }
 .msg-user { align-items: flex-end; }
@@ -237,7 +240,7 @@ body {
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-panel { display: none; } .tab-panel.active { display: block; }
 .exch-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-family: 'Space Mono', monospace; padding: 3px 8px; border-radius: 20px; }
-.exch-badge.bitunix { background: rgba(255, 215, 0, .1); color: var(--accent); border: 1px solid rgba(255, 215, 0, .2); }
+.exch-badge.bitunix { background: rgba(255, 192, 0, .1); color: var(--accent); border: 1px solid rgba(255, 192, 0, .2); }
 .exch-badge.bitmart { background: rgba(0, 174, 228, .1); color: #00aae4; border: 1px solid rgba(0, 174, 228, .2); }
 
 @media (max-width: 768px) {
@@ -248,6 +251,11 @@ body {
   .header { padding: 10px 15px; }
   .logo-text { display: none; } 
 }
+
+/* ═════ SVG LOGO ESTILOS ═════ */
+.svg-logo {
+  width: 100%; height: 100%;
+}
 </style>
 </head>
 <body>
@@ -255,7 +263,12 @@ body {
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <img src="./logo.png" alt="CM" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
+      <svg class="svg-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 20 70 L 20 30 L 50 50 L 80 30 L 80 70 L 65 55 L 65 45 L 50 60 L 35 45 L 35 55 Z" fill="#FFC000"/>
+        <rect x="25" y="60" width="6" height="20" fill="#FFC000" />
+        <rect x="47" y="70" width="6" height="20" fill="#FFC000" />
+        <rect x="69" y="55" width="6" height="20" fill="#FFC000" />
+      </svg>
     </div>
     <div class="login-title">BOT_CM trading</div>
     <div class="login-sub">Asesor de Trading VIP</div>
@@ -288,7 +301,12 @@ body {
   <header class="header">
     <div class="logo">
       <div class="logo-mark">
-        <img src="./logo.png" alt="CM" style="width:100%;height:100%;object-fit:contain;padding:2px;" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
+        <svg class="svg-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 20 70 L 20 30 L 50 50 L 80 30 L 80 70 L 65 55 L 65 45 L 50 60 L 35 45 L 35 55 Z" fill="#0a0a0f"/>
+          <rect x="25" y="60" width="6" height="20" fill="#0a0a0f" />
+          <rect x="47" y="70" width="6" height="20" fill="#0a0a0f" />
+          <rect x="69" y="55" width="6" height="20" fill="#0a0a0f" />
+        </svg>
       </div>
       <div>
         <div class="logo-text">BOT_CM trading</div>
@@ -382,7 +400,12 @@ body {
       <div class="chat-area" id="chatArea">
         <div class="welcome" id="welcome">
           <div class="welcome-logo">
-            <img src="./logo.png" alt="CM" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
+             <svg class="svg-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 70 L 20 30 L 50 50 L 80 30 L 80 70 L 65 55 L 65 45 L 50 60 L 35 45 L 35 55 Z" fill="#FFC000"/>
+              <rect x="25" y="60" width="6" height="20" fill="#FFC000" />
+              <rect x="47" y="70" width="6" height="20" fill="#FFC000" />
+              <rect x="69" y="55" width="6" height="20" fill="#FFC000" />
+            </svg>
           </div>
           <h2>BOT_CM trading</h2>
           
@@ -581,7 +604,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
   if (!usdt || usdt <= 0) { showToast('Introduce la cantidad en USDT', 'error'); return; }
   if (!slFinal) { showToast('Introduce el Stop Loss', 'error'); return; }
-  if (!tpFinal) { showToast('Introduce el Take Profit', 'error'); return; }
 
   var precio = prices[sym] || entradaFinal;
   if (!precio) { showToast('Precio no disponible', 'error'); return; }
@@ -662,7 +684,7 @@ function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderTy
       '<div class="order-detail">Precio: <span>~$' + precio.toFixed(4) + '</span></div>' +
       '<div class="order-detail">Exchange: <span>' + exchName + '</span></div>' +
       '<div class="order-detail">SL: <span style="color:var(--down)">$' + sl + '</span></div>' +
-      '<div class="order-detail">TP1: <span style="color:var(--up)">$' + tp + '</span></div>' +
+      '<div class="order-detail">TP1: <span style="color:var(--up)">$' + (tp || '--') + '</span></div>' +
       '</div></div>';
     showToast('Orden ' + (otLabel[orderType] || orderType) + ' enviada', 'success');
   } else {
@@ -857,7 +879,7 @@ function parsearSenal(text) {
 }
 
 function buildSignalCard(text, senal, rawText) {
-  if (!senal || !senal.asset || (!senal.sl && !senal.tp1)) return null;
+  if (!senal || !senal.asset) return null;
   
   var sym = senal.asset;
   var uid = 'card_' + Date.now() + Math.floor(Math.random()*100);
