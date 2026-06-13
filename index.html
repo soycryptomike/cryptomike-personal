@@ -64,6 +64,13 @@ body {
   border-radius: var(--radius-sm); padding: 11px 14px; color: var(--text);
   font-size: 14px; outline: none; font-family: 'Space Grotesk', sans-serif;
 }
+/* Quitar flechas del input number en Chrome/Safari/Edge */
+.login-field input::-webkit-outer-spin-button,
+.login-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none; margin: 0;
+}
+.login-field input[type=number] { -moz-appearance: textfield; }
+
 .login-field input:focus, .login-field select:focus { border-color: var(--accent); }
 .login-field input::placeholder { color: var(--text3); }
 
@@ -174,8 +181,6 @@ body {
 /* CHAT AREA Y BIENVENIDA */
 .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
 .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
-
-/* LOGO DE BIENVENIDA (CUADRADO REDONDEADO) */
 .welcome-logo { 
   width: 100px; height: 100px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; 
   border-radius: 16px; background: #ffffff; border: 2px solid var(--accent); overflow: hidden; padding: 8px;
@@ -282,7 +287,7 @@ body {
     
     <div class="login-field">
       <label>Tu UID del exchange</label>
-      <input type="text" id="loginUid" placeholder="Introduce tu UID..." />
+      <input type="number" id="loginUid" placeholder="Introduce tu UID (solo números)..." onkeydown="if(event.key==='Enter')doLogin()" />
     </div>
     
     <div class="login-field">
@@ -445,6 +450,34 @@ var prices = { XLM: 0, XRP: 0, HBAR: 0, BTC: 0, ETH: 0, SOL: 0, XAUUSDT: 0 };
 var priceInterval = null;
 var activeExchange = 'bitunix';
 
+// ═════ UTILIDADES DE PERIODO (AUTO-LOGOUT QUINCENAL) ═════
+function getCurrentPeriod() {
+  var d = new Date();
+  // El periodo es: AÑO-MES-1 (si es <= 15) o AÑO-MES-2 (si es > 15)
+  return d.getFullYear() + '-' + d.getMonth() + '-' + (d.getDate() <= 15 ? 1 : 2);
+}
+
+function checkSessionExpiry() {
+  if (document.getElementById('appScreen').style.display === 'block') {
+    var savedPeriod = localStorage.getItem('cm_login_period');
+    if (savedPeriod && savedPeriod !== getCurrentPeriod()) {
+      showToast('La quincena ha terminado. Inicia sesión con la nueva contraseña.', 'warn');
+      doLogout();
+    }
+  }
+}
+// Chequear cada minuto si ha cambiado la quincena
+setInterval(checkSessionExpiry, 60000);
+
+// ═════ CARGAR DATOS GUARDADOS (AUTO-FILL) ═════
+function loadSavedData() {
+  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'bitmartKey', 'bitmartSecret', 'bitmartMemo'];
+  fields.forEach(function(f) {
+    var val = localStorage.getItem('cm_' + f);
+    if (val) document.getElementById(f).value = val;
+  });
+}
+
 function doLogin() {
   var uid = document.getElementById('loginUid').value.trim();
   var password = document.getElementById('loginPassword').value.trim();
@@ -471,6 +504,13 @@ function doLogin() {
       document.getElementById('appScreen').style.display = 'block';
       
       selectExchange(exchange.toLowerCase());
+      
+      // Guardar el periodo de login actual
+      localStorage.setItem('cm_login_period', getCurrentPeriod());
+      
+      // Cargar APIs guardadas
+      loadSavedData();
+      
       showToast('Bienvenido. Contraseña válida ' + data.daysUntilExpiry + ' días más.', 'success');
     } else {
       showLoginError(data.error || 'Contraseña incorrecta. Obténla en el canal VIP.');
@@ -529,6 +569,12 @@ function conectar() {
   var ak = document.getElementById('anthropicKey').value.trim();
   if (!ak) { showToast('Introduce tu Anthropic API Key', 'error'); return; }
   
+  // GUARDAR APIs en localStorage
+  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'bitmartKey', 'bitmartSecret', 'bitmartMemo'];
+  fields.forEach(function(f) {
+    localStorage.setItem('cm_' + f, document.getElementById(f).value.trim());
+  });
+  
   document.getElementById('statusDot').classList.add('live');
   document.getElementById('statusText').textContent = 'conectado · precios en vivo';
   
@@ -537,7 +583,7 @@ function conectar() {
   badge.className = 'exch-badge ' + activeExchange;
   badge.textContent = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
   
-  showToast('Conectado', 'success');
+  showToast('Conectado y APIs guardadas', 'success');
   
   fetchPrices();
   if (priceInterval) clearInterval(priceInterval);
@@ -782,7 +828,6 @@ function llamarClaude(promptText) {
     return showToast('Introduce Anthropic API Key', 'error'); 
   }
   
-  // INSTRUCCIONES ESTRICTAS PARA SCALPING (5m/15m/1H) Y FORMATO INQUEBRANTABLE
   var sp = 'Eres CryptoAdvisor, experto en SCALPING e INTRADIA. Analizas CUALQUIER criptomoneda en futuros perpetuos. Metodologia SMC/ICT. Temporalidades a analizar: 1H, 15M y 5M. Duracion maxima: minutos a 1 dia.\n\nREGLAS VITALES:\n1. Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n2. LONG: Stop Loss MENOR que Entrada. TPs MAYORES.\n3. SHORT: Stop Loss MAYOR que Entrada. TPs MENORES.\n\nFORMATO OBLIGATORIO AL FINAL DE TU RESPUESTA:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nESTRUCTURA (1H, 15M, 5M)\n- [Resumen de tendencia y liquidez]\n\nSETUP OPERATIVO\n- Accion: COMPRAR / VENDER / ESPERAR\n- Tipo de orden: MERCADO / LIMITE / NINGUNA\n- Entrada: $[precio]\n- Stop Loss: $[precio]\n- TP1: $[precio]\n- TP2: $[precio] (Si lo hay)\n- TP3: $[precio] (Si lo hay)\n- Gestion: [Ej: 100% TP1 o 50% TP1 50% TP2]\n- Razon: [Explica que confirmacion tecnica esperas o por que entras]\n==========================\nNOTA: Si la Accion es ESPERAR porque no hay setup claro, explica en "Razon" que confirmacion esperar. Aún así, SIEMPRE imprime el formato de tarjeta de arriba con la info disponible.';
 
   conversationHistory.push({ role: 'user', content: promptText });
@@ -831,7 +876,6 @@ function parsearSenal(text) {
     prices[data.asset] = data.price; 
   }
 
-  // RECONOCIMIENTO ACTIVO ESTRICTO
   if (!data.asset) {
     var knownAssets = ['BTC','ETH','SOL','XLM','XRP','HBAR','XAUUSDT','ADA','DOGE','AVAX','LINK','DOT','BNB','SUI','MATIC','UNI'];
     var regex = new RegExp('\\b(' + knownAssets.join('|') + ')\\b', 'i');
@@ -845,7 +889,6 @@ function parsearSenal(text) {
   else if (/\bSHORT\b|VENDER/i.test(norm)) { data.direction = 'SHORT'; data.action = 'VENDER'; } 
   else if (/\bESPERAR\b/i.test(norm)) { data.action = 'ESPERAR'; }
 
-  // DETECCION DE PRECIOS MEJORADA Y MÁS FLEXIBLE
   var getNum = (regex) => { 
     var mt = norm.match(regex); 
     return mt ? parseFloat(mt[1].replace(/,/g, '.')) : null; 
@@ -857,10 +900,8 @@ function parsearSenal(text) {
   data.tp2 = getNum(/TP2.*?\$?\s*([\d.,]+)/i);
   data.tp3 = getNum(/TP3.*?\$?\s*([\d.,]+)/i);
 
-  // DETECCION DE TIPO DE ORDEN
   if (/Tipo(?:.*)?MERCADO/i.test(norm)) data.orderType = 'market';
 
-  // DETECCION DE GESTION Y PORCENTAJES
   var gest1 = norm.match(/(\d+)%\s*TP1/i);
   var gest2 = norm.match(/(\d+)%\s*TP2/i);
   var gest3 = norm.match(/(\d+)%\s*TP3/i);
@@ -870,11 +911,11 @@ function parsearSenal(text) {
     data.p2 = gest2 ? parseInt(gest2[1]) : 0;
     data.p3 = gest3 ? parseInt(gest3[1]) : 0;
   } else if (data.tp2 && !data.tp3) {
-    data.p1 = 50; data.p2 = 50; // default 2 TPs
+    data.p1 = 50; data.p2 = 50;
   } else if (data.tp3) {
-    data.p1 = 30; data.p2 = 40; data.p3 = 30; // default 3 TPs
+    data.p1 = 30; data.p2 = 40; data.p3 = 30;
   } else {
-    data.p1 = 100; // default 1 TP
+    data.p1 = 100;
   }
 
   var reasonM = norm.match(/Razon(?:.*?):\s*([^\n]+)/i);
@@ -903,9 +944,8 @@ function buildSignalCard(text, senal, rawText) {
   else if (senal.direction === 'SHORT' || senal.action === 'VENDER') { badgeClass = 'badge-short'; badgeText = 'SHORT'; }
   else if (senal.action === 'ESPERAR') { badgeClass = 'badge-wait'; badgeText = 'ESPERAR'; }
 
-  // RENDERIZADO DINAMICO DE TPs (Solo los que existan)
   var tpHtml = '';
-  if (senal.tp1 || (!senal.tp1 && !senal.tp2 && !senal.tp3)) { // Siempre al menos 1 TP
+  if (senal.tp1 || (!senal.tp1 && !senal.tp2 && !senal.tp3)) { 
     tpHtml += `
       <div class="exec-field">
         <label>TP1 $</label>
@@ -936,7 +976,6 @@ function buildSignalCard(text, senal, rawText) {
       </div>`;
   }
 
-  // ESTADO DE ESPERA (Si es ESPERAR y no hay niveles claros, ocultar ejecución)
   var executePanelHtml = '';
   if (senal.action !== 'ESPERAR' || (senal.action === 'ESPERAR' && senal.entry && senal.sl)) {
     executePanelHtml = `
