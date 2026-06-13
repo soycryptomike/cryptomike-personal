@@ -624,27 +624,36 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
-// ═════ NUEVA LÓGICA DE EJECUCIÓN MULTI-TP FRACCIONADA ═════
+// ═════ MOTOR DE EJECUCIÓN INTELIGENTE (LIMIT VS TRIGGER) CON MULTI-TP FRACCIONADO ═════
 function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType) {
   var usdt = getVal('exec-usdt-' + uid);
   var entradaFinal = getVal('exec-entry-' + uid) || entrada;
   var slFinal = getVal('exec-sl-' + uid) || sl;
   var lev = getVal('exec-lev-' + uid) || leverage;
+  var precioActual = prices[sym];
 
   if (!usdt || usdt <= 0) { showToast('Introduce la cantidad en USDT', 'error'); return; }
+  if (!precioActual) { showToast('Esperando precio en vivo para el cálculo...', 'warn'); return; }
 
-  var precio = prices[sym] || entradaFinal;
-  if (!precio) { showToast('Precio no disponible', 'error'); return; }
-
+  // Detectar la selección del panel de la web
   var ot = document.querySelector('#exec-types-' + uid + ' .sel-market, #exec-types-' + uid + ' .sel-limit');
-  if (ot) {
-    if (ot.classList.contains('sel-market')) orderType = 'market';
-    else orderType = 'limit';
+  var esMercado = ot ? ot.classList.contains('sel-market') : (orderType === 'market');
+  var tipoOrden = 'limit'; 
+
+  if (esMercado) {
+    tipoOrden = 'market';
+  } else {
+    // NUEVA LÓGICA INTELIGENTE: Clasifica si es una Limit real o una Trigger (Stop-Market)
+    if (side === 'LONG') {
+      tipoOrden = (entradaFinal > precioActual) ? 'stop_market' : 'limit';
+    } else {
+      tipoOrden = (entradaFinal < precioActual) ? 'stop_market' : 'limit';
+    }
   }
 
-  var precioEjecucion = orderType === 'market' ? precio : entradaFinal;
+  var precioEjecucion = esMercado ? precioActual : entradaFinal;
 
-  // RECOLECTAR TODOS LOS TPs Y PORCENTAJES
+  // Recolectar tramos Take Profit dinámicos
   var tramos = [];
   var totalPct = 0;
   for (var i = 1; i <= 3; i++) {
@@ -656,7 +665,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     }
   }
 
-  // Fallback si no hay TPs válidos
   if (tramos.length === 0) {
     var tp1Fallback = getVal('exec-tp1-' + uid) || tp;
     if (tp1Fallback > 0) {
@@ -665,7 +673,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     }
   }
 
-  // Verificación estricta del 100%
   if (tramos.length > 0 && totalPct !== 100) {
     showToast('Los porcentajes de TP suman ' + totalPct + '%. Deben sumar 100%.', 'warn');
     return;
@@ -680,17 +687,26 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   var levBody = activeExchange === 'bitunix' ? { symbol: symParam, leverage: lev } : { symbol: symParam, leverage: lev, openType: 'isolated' };
 
   reqFn('leverage', levBody).then(function() {
-    showToast('Enviando órdenes (' + tramos.length + ' tramos) a ' + activeExchange + '...', '');
+    showToast('Disparando órdenes (' + tramos.length + ' tramos) como ' + tipoOrden.toUpperCase() + '...', '');
     
-    // CREAR LAS ÓRDENES FRACCIONADAS
-    var promises = tramos.map(function(tramo, index) {
+    var promises = tramos.map(function(tramo) {
       var qtyTranche = parseFloat((totalRawQty * (tramo.pct / 100)).toFixed(5));
-      if (qtyTranche <= 0) return Promise.resolve({ error: 'Cantidad muy pequeña en un tramo' });
+      if (qtyTranche <= 0) return Promise.resolve({ error: 'Cantidad muy pequeña en este tramo' });
       
       var orderBody = { symbol: symParam, side: side, sl: slFinal, tp: tramo.price };
       orderBody[qtyParam] = qtyTranche;
-      orderBody[otParam] = orderType;
-      if (orderType === 'limit') orderBody.price = entradaFinal;
+      
+      if (tipoOrden === 'market') {
+        orderBody[otParam] = 'market';
+      } else if (tipoOrden === 'limit') {
+        orderBody[otParam] = 'limit';
+        orderBody.price = entradaFinal;
+      } else {
+        // STOP_MARKET / TRIGGER AUTOMÁTICO
+        orderBody[otParam] = 'stop_market';
+        orderBody.triggerPrice = entradaFinal;
+        orderBody.price = entradaFinal; 
+      }
       
       return reqFn('order', orderBody);
     });
@@ -699,14 +715,12 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   }).then(function(results) {
     var allOk = results.every(r => r && (r.code === 0 || r.code === 1000));
     var msg = results[0] && (results[0].msg || results[0].message) || 'Error desconocido';
-    
-    // Preparar el desglose visual de TPs
     var tpListHtml = tramos.map((t, i) => 'TP' + (i+1) + ' (' + t.pct + '%): <span style="color:var(--up)">$' + t.price + '</span>').join('<br>');
     
-    mostrarResultadoOrdenMulti(allOk, side, sym, usdt, precioEjecucion, slFinal, tpListHtml, lev, orderType, allOk ? 'Ejecutado correctamente' : msg);
+    mostrarResultadoOrdenMulti(allOk, side, sym, usdt, precioEjecucion, slFinal, tpListHtml, lev, tipoOrden.toUpperCase(), allOk ? 'Ejecutado correctamente' : msg);
     fetchPositions();
   }).catch(function(e) {
-    showToast('Error de red al enviar', 'error');
+    showToast('Error de red al enviar la operación', 'error');
   });
 }
 
@@ -722,22 +736,20 @@ function setExecOrderType(sym, uid, type) {
   }
 }
 
-// ═════ NUEVO CARTEL DE CONFIRMACIÓN CON DESGLOSE ═════
-function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml, lev, orderType, errMsg) {
+function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml, lev, orderLabel, errMsg) {
   var w = document.getElementById('welcome'); if (w) w.style.display = 'none';
   var exchName = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
-  var otLabel = { market: 'MERCADO', limit: 'LIMITE' };
   var div = document.createElement('div');
   div.className = 'msg msg-ai';
   if (ok) {
     div.innerHTML = '<div class="msg-label">ORDEN ENVIADA</div><div class="order-confirm success">' +
-      '<div style="font-size:13px;font-weight:600;color:var(--up);margin-bottom:8px;">OK ' + side + ' ' + sym + ' (' + (otLabel[orderType] || orderType.toUpperCase()) + ') en ' + exchName + '</div>' +
+      '<div style="font-size:13px;font-weight:600;color:var(--up);margin-bottom:8px;">OK ' + side + ' ' + sym + ' (' + orderLabel + ') en ' + exchName + '</div>' +
       '<div class="order-detail-grid" style="grid-template-columns: 1fr;">' +
       '<div class="order-detail">Capital Total: <span>$' + usdt + '</span> · Apal: <span>' + lev + 'x</span></div>' +
-      '<div class="order-detail">Precio: <span>~$' + precio.toFixed(4) + '</span> · SL: <span style="color:var(--down)">$' + (sl || '--') + '</span></div>' +
-      '<div class="order-detail" style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border2); line-height:1.6;"><b>Fraccionamiento Take Profit:</b><br>' + tpListHtml + '</div>' +
+      '<div class="order-detail">Precio Configurado: <span>~$' + precio.toFixed(4) + '</span> · SL: <span style="color:var(--down)">$' + (sl || '--') + '</span></div>' +
+      '<div class="order-detail" style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border2); line-height:1.6;"><b>Fraccionamiento de Salidas:</b><br>' + tpListHtml + '</div>' +
       '</div></div>';
-    showToast('Orden ' + (otLabel[orderType] || orderType) + ' enviada y dividida', 'success');
+    showToast('Orden ' + orderLabel + ' enviada y gestionada con éxito', 'success');
   } else {
     div.innerHTML = '<div class="msg-label">ERROR</div><div class="order-confirm error">' +
       '<div style="font-size:13px;font-weight:600;color:var(--down);">Error en ' + exchName + '</div>' +
