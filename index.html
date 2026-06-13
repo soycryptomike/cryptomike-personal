@@ -46,7 +46,6 @@ body {
   text-align: center; box-shadow: 0 0 60px rgba(255, 192, 0, 0.05);
 }
 
-/* LOGO PANTALLA INICIO */
 .login-logo {
   width: 120px; height: 120px; margin: 0 auto 20px;
   display: flex; align-items: center; justify-content: center;
@@ -65,7 +64,6 @@ body {
   border-radius: var(--radius-sm); padding: 11px 14px; color: var(--text);
   font-size: 14px; outline: none; font-family: 'Space Grotesk', sans-serif;
 }
-/* Quitar flechas del input number en Chrome/Safari/Edge */
 .login-field input::-webkit-outer-spin-button,
 .login-field input::-webkit-inner-spin-button {
   -webkit-appearance: none; margin: 0;
@@ -100,8 +98,6 @@ body {
 }
 
 .logo { display: flex; align-items: center; gap: 10px; }
-
-/* LOGO ESQUINA SUPERIOR IZQUIERDA */
 .logo-mark {
   width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; overflow: hidden;
   border-radius: 8px; background: #ffffff; border: 1px solid rgba(255, 192, 0, 0.4); padding: 4px;
@@ -184,8 +180,6 @@ body {
 /* CHAT AREA Y BIENVENIDA */
 .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
 .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
-
-/* LOGO DE BIENVENIDA */
 .welcome-logo { 
   width: 100px; height: 100px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; 
   border-radius: 16px; background: #ffffff; border: 2px solid var(--accent); overflow: hidden; padding: 8px;
@@ -455,7 +449,6 @@ var prices = { XLM: 0, XRP: 0, HBAR: 0, BTC: 0, ETH: 0, SOL: 0, XAUUSDT: 0 };
 var priceInterval = null;
 var activeExchange = 'bitunix';
 
-// ═════ UTILIDADES DE PERIODO (AUTO-LOGOUT QUINCENAL) ═════
 function getCurrentPeriod() {
   var d = new Date();
   return d.getFullYear() + '-' + d.getMonth() + '-' + (d.getDate() <= 15 ? 1 : 2);
@@ -472,7 +465,6 @@ function checkSessionExpiry() {
 }
 setInterval(checkSessionExpiry, 60000);
 
-// ═════ CARGAR DATOS GUARDADOS (AUTO-FILL) ═════
 function loadSavedData() {
   var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'bitmartKey', 'bitmartSecret', 'bitmartMemo'];
   fields.forEach(function(f) {
@@ -632,11 +624,11 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
+// ═════ NUEVA LÓGICA DE EJECUCIÓN MULTI-TP FRACCIONADA ═════
 function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType) {
   var usdt = getVal('exec-usdt-' + uid);
   var entradaFinal = getVal('exec-entry-' + uid) || entrada;
   var slFinal = getVal('exec-sl-' + uid) || sl;
-  var tpFinal = getVal('exec-tp1-' + uid) || tp; 
   var lev = getVal('exec-lev-' + uid) || leverage;
 
   if (!usdt || usdt <= 0) { showToast('Introduce la cantidad en USDT', 'error'); return; }
@@ -652,47 +644,70 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
   var precioEjecucion = orderType === 'market' ? precio : entradaFinal;
 
-  if (activeExchange === 'bitunix') {
-    var rawQty = usdt * lev / precioEjecucion;
-    var qty = parseFloat(rawQty.toFixed(5));
-    if (qty <= 0) { showToast('Cantidad muy pequeña tras el cálculo', 'error'); return; }
-    
-    bitunixReq('leverage', { symbol: sym + 'USDT', leverage: lev }).then(function() {
-      showToast('Enviando orden ' + orderType + ' a Bitunix...', '');
-      var orderBody = { symbol: sym + 'USDT', side: side, qty: qty, sl: slFinal, tp: tpFinal };
-      
-      if (orderType === 'limit') {
-        orderBody.orderType = 'limit'; 
-        orderBody.price = entradaFinal;
-      } else {
-        orderBody.orderType = 'market';
-      }
-      return bitunixReq('order', orderBody);
-    }).then(function(res) {
-      mostrarResultadoOrden(res && res.code === 0, side, sym, usdt, precioEjecucion, slFinal, tpFinal, lev, orderType, res ? res.msg : 'Error');
-      fetchPositions();
-    });
-  } else {
-    var rawSize = usdt * lev / precioEjecucion;
-    var size = parseFloat(rawSize.toFixed(5));
-    if (size <= 0) { showToast('Cantidad muy pequeña tras el cálculo', 'error'); return; }
-    
-    bitmartReq('leverage', { symbol: sym + '_USDT', leverage: lev, openType: 'isolated' }).then(function() {
-      showToast('Enviando orden ' + orderType + ' a BitMart...', '');
-      var orderBody = { symbol: sym + '_USDT', side: side, size: size, sl: slFinal, tp: tpFinal };
-      
-      if (orderType === 'limit') {
-        orderBody.type = 'limit';
-        orderBody.price = entradaFinal;
-      } else {
-        orderBody.type = 'market';
-      }
-      return bitmartReq('order', orderBody);
-    }).then(function(res) {
-      mostrarResultadoOrden(res && res.code === 1000, side, sym, usdt, precioEjecucion, slFinal, tpFinal, lev, orderType, res ? res.message : 'Error');
-      fetchPositions();
-    });
+  // RECOLECTAR TODOS LOS TPs Y PORCENTAJES
+  var tramos = [];
+  var totalPct = 0;
+  for (var i = 1; i <= 3; i++) {
+    var tpVal = getVal('exec-tp' + i + '-' + uid);
+    var pVal = getVal('exec-p' + i + '-' + uid);
+    if (tpVal > 0 && pVal > 0) {
+      tramos.push({ price: tpVal, pct: pVal });
+      totalPct += pVal;
+    }
   }
+
+  // Fallback si no hay TPs válidos
+  if (tramos.length === 0) {
+    var tp1Fallback = getVal('exec-tp1-' + uid) || tp;
+    if (tp1Fallback > 0) {
+      tramos.push({ price: tp1Fallback, pct: 100 });
+      totalPct = 100;
+    }
+  }
+
+  // Verificación estricta del 100%
+  if (tramos.length > 0 && totalPct !== 100) {
+    showToast('Los porcentajes de TP suman ' + totalPct + '%. Deben sumar 100%.', 'warn');
+    return;
+  }
+
+  var totalRawQty = usdt * lev / precioEjecucion;
+  var reqFn = activeExchange === 'bitunix' ? bitunixReq : bitmartReq;
+  var symParam = activeExchange === 'bitunix' ? sym + 'USDT' : sym + '_USDT';
+  var qtyParam = activeExchange === 'bitunix' ? 'qty' : 'size';
+  var otParam = activeExchange === 'bitunix' ? 'orderType' : 'type';
+
+  var levBody = activeExchange === 'bitunix' ? { symbol: symParam, leverage: lev } : { symbol: symParam, leverage: lev, openType: 'isolated' };
+
+  reqFn('leverage', levBody).then(function() {
+    showToast('Enviando órdenes (' + tramos.length + ' tramos) a ' + activeExchange + '...', '');
+    
+    // CREAR LAS ÓRDENES FRACCIONADAS
+    var promises = tramos.map(function(tramo, index) {
+      var qtyTranche = parseFloat((totalRawQty * (tramo.pct / 100)).toFixed(5));
+      if (qtyTranche <= 0) return Promise.resolve({ error: 'Cantidad muy pequeña en un tramo' });
+      
+      var orderBody = { symbol: symParam, side: side, sl: slFinal, tp: tramo.price };
+      orderBody[qtyParam] = qtyTranche;
+      orderBody[otParam] = orderType;
+      if (orderType === 'limit') orderBody.price = entradaFinal;
+      
+      return reqFn('order', orderBody);
+    });
+
+    return Promise.all(promises);
+  }).then(function(results) {
+    var allOk = results.every(r => r && (r.code === 0 || r.code === 1000));
+    var msg = results[0] && (results[0].msg || results[0].message) || 'Error desconocido';
+    
+    // Preparar el desglose visual de TPs
+    var tpListHtml = tramos.map((t, i) => 'TP' + (i+1) + ' (' + t.pct + '%): <span style="color:var(--up)">$' + t.price + '</span>').join('<br>');
+    
+    mostrarResultadoOrdenMulti(allOk, side, sym, usdt, precioEjecucion, slFinal, tpListHtml, lev, orderType, allOk ? 'Ejecutado correctamente' : msg);
+    fetchPositions();
+  }).catch(function(e) {
+    showToast('Error de red al enviar', 'error');
+  });
 }
 
 function setExecOrderType(sym, uid, type) {
@@ -707,7 +722,8 @@ function setExecOrderType(sym, uid, type) {
   }
 }
 
-function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderType, errMsg) {
+// ═════ NUEVO CARTEL DE CONFIRMACIÓN CON DESGLOSE ═════
+function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml, lev, orderType, errMsg) {
   var w = document.getElementById('welcome'); if (w) w.style.display = 'none';
   var exchName = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
   var otLabel = { market: 'MERCADO', limit: 'LIMITE' };
@@ -716,17 +732,12 @@ function mostrarResultadoOrden(ok, side, sym, usdt, precio, sl, tp, lev, orderTy
   if (ok) {
     div.innerHTML = '<div class="msg-label">ORDEN ENVIADA</div><div class="order-confirm success">' +
       '<div style="font-size:13px;font-weight:600;color:var(--up);margin-bottom:8px;">OK ' + side + ' ' + sym + ' (' + (otLabel[orderType] || orderType.toUpperCase()) + ') en ' + exchName + '</div>' +
-      '<div class="order-detail-grid">' +
-      '<div class="order-detail">Activo: <span>' + sym + 'USDT</span></div>' +
-      '<div class="order-detail">Tipo: <span>' + (otLabel[orderType] || orderType) + '</span></div>' +
-      '<div class="order-detail">Capital: <span>$' + usdt + '</span></div>' +
-      '<div class="order-detail">Apal: <span>' + lev + 'x</span></div>' +
-      '<div class="order-detail">Precio: <span>~$' + precio.toFixed(4) + '</span></div>' +
-      '<div class="order-detail">Exchange: <span>' + exchName + '</span></div>' +
-      '<div class="order-detail">SL: <span style="color:var(--down)">$' + (sl || '--') + '</span></div>' +
-      '<div class="order-detail">TP1: <span style="color:var(--up)">$' + (tp || '--') + '</span></div>' +
+      '<div class="order-detail-grid" style="grid-template-columns: 1fr;">' +
+      '<div class="order-detail">Capital Total: <span>$' + usdt + '</span> · Apal: <span>' + lev + 'x</span></div>' +
+      '<div class="order-detail">Precio: <span>~$' + precio.toFixed(4) + '</span> · SL: <span style="color:var(--down)">$' + (sl || '--') + '</span></div>' +
+      '<div class="order-detail" style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border2); line-height:1.6;"><b>Fraccionamiento Take Profit:</b><br>' + tpListHtml + '</div>' +
       '</div></div>';
-    showToast('Orden ' + (otLabel[orderType] || orderType) + ' enviada', 'success');
+    showToast('Orden ' + (otLabel[orderType] || orderType) + ' enviada y dividida', 'success');
   } else {
     div.innerHTML = '<div class="msg-label">ERROR</div><div class="order-confirm error">' +
       '<div style="font-size:13px;font-weight:600;color:var(--down);">Error en ' + exchName + '</div>' +
