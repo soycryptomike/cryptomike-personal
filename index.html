@@ -46,7 +46,6 @@ body {
   text-align: center; box-shadow: 0 0 60px rgba(255, 192, 0, 0.05);
 }
 
-/* LOGO PANTALLA INICIO (CUADRADO REDONDEADO PARA QUE NO SE CORTE LA M) */
 .login-logo {
   width: 120px; height: 120px; margin: 0 auto 20px;
   display: flex; align-items: center; justify-content: center;
@@ -93,8 +92,6 @@ body {
 }
 
 .logo { display: flex; align-items: center; gap: 10px; }
-
-/* LOGO ESQUINA SUPERIOR IZQUIERDA */
 .logo-mark {
   width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; overflow: hidden;
   border-radius: 8px; background: #ffffff; border: 1px solid rgba(255, 192, 0, 0.4); padding: 2px;
@@ -404,15 +401,15 @@ body {
           <div class="welcome-card">
             <div class="welcome-feature">
               <span>🤖</span>
-              <span><b>IA Conversacional:</b> Asistente inteligente 24/7. Pide análisis completos de mercado, setups o compara proyectos al instante con metodología SMC.</span>
+              <span><b>IA de Scalping:</b> Asistente inteligente 24/7. Analiza 1H, 15M y 5M en segundos para encontrar setups intradía.</span>
             </div>
             <div class="welcome-feature">
               <span>🎯</span>
-              <span><b>Multi-TP Automático:</b> Configura tus salidas (TP1, TP2, TP3) por porcentajes y el bot se encarga de fraccionar tu orden en el exchange.</span>
+              <span><b>Multi-TP Dinámico:</b> Configura tus salidas (TP1, TP2, TP3) por porcentajes y el bot divide la orden en tu exchange.</span>
             </div>
             <div class="welcome-feature">
               <span>📱</span>
-              <span><b>Alertas en Telegram:</b> Recibe el detalle de tus operativas ejecutadas directamente en tu móvil para un control total.</span>
+              <span><b>Alertas en Telegram:</b> Recibe el detalle de tus operativas ejecutadas directamente en tu móvil.</span>
             </div>
           </div>
 
@@ -502,7 +499,6 @@ function doLogout() {
   document.getElementById('statusText').textContent = 'sin conectar';
 }
 
-// FUNCION MEJORADA: Protege contra comas europeas en los precios
 function getVal(id) { 
   var el = document.getElementById(id); 
   if (!el || !el.value) return 0;
@@ -613,7 +609,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   var precioEjecucion = orderType === 'market' ? precio : entradaFinal;
 
   if (activeExchange === 'bitunix') {
-    // Calculo de Cantidad con Decimales para evitar el error de "BTC Cantidad muy pequena"
     var rawQty = usdt * lev / precioEjecucion;
     var qty = parseFloat(rawQty.toFixed(5));
     if (qty <= 0) { showToast('Cantidad muy pequeña tras el cálculo', 'error'); return; }
@@ -634,7 +629,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
       fetchPositions();
     });
   } else {
-    // Para BitMart
     var rawSize = usdt * lev / precioEjecucion;
     var size = parseFloat(rawSize.toFixed(5));
     if (size <= 0) { showToast('Cantidad muy pequeña tras el cálculo', 'error'); return; }
@@ -788,7 +782,8 @@ function llamarClaude(promptText) {
     return showToast('Introduce Anthropic API Key', 'error'); 
   }
   
-  var sp = 'Eres CryptoAdvisor, asesor experto en trading. Analizas CUALQUIER criptomoneda (BTC, ETH, SOL, XRP, etc.) o Forex (XAUUSDT) en futuros perpetuos. Metodologia SMC/ICT. Riesgo 2%.\n\nREGLA VITAL DE FORMATO: Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n\nMODO DE RESPONDER:\n1. Si el usuario te hace una pregunta general, compara activos (ej: "XRP vs XLM") o pide consejos, ACTÚA COMO UN CHAT NATURAL. Razona con él, compara los fundamentales, la estructura, y dale una respuesta hablada.\n2. Si el usuario te pide una operativa explícita ("dame una operativa para...", "setup de...") o si durante tu análisis natural concluyes que hay una buena entrada, OBLIGATORIAMENTE debes incluir al FINAL de tu mensaje el siguiente formato exacto (para que el sistema dibuje la tarjeta):\n\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nCONTEXTO FUNDAMENTAL\n- Sesgo fundamental: ALCISTA / BAJISTA / NEUTRAL\n\nESTRUCTURA SMC\n- Estructura: ALCISTA / BAJISTA / RANGO\n\nSETUP OPERATIVO\n- Direccion: LONG / SHORT / ESPERAR\n- Entrada: $[precio]\n- Stop Loss: $[precio]\n- TP1: $[precio]\n- TP2: $[precio]\n- TP3: $[precio]\n- Gestion: 30% TP1 40% TP2 30% TP3\n- Confianza: [X]/10\n- Razon: [breve explicacion de 1 linea]\n- Accion: COMPRAR / VENDER / ESPERAR\n==========================\n\nREGLAS LOGICAS ESTRICTAS:\n- SHORT: SL MAYOR que Entrada. TPs MENORES que Entrada.\n- LONG: SL MENOR que Entrada. TPs MAYORES que Entrada.';
+  // INSTRUCCIONES ESTRICTAS PARA SCALPING (5m/15m/1H) Y FORMATO INQUEBRANTABLE
+  var sp = 'Eres CryptoAdvisor, experto en SCALPING e INTRADIA. Analizas CUALQUIER criptomoneda en futuros perpetuos. Metodologia SMC/ICT. Temporalidades a analizar: 1H, 15M y 5M. Duracion maxima: minutos a 1 dia.\n\nREGLAS VITALES:\n1. Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n2. LONG: Stop Loss MENOR que Entrada. TPs MAYORES.\n3. SHORT: Stop Loss MAYOR que Entrada. TPs MENORES.\n\nFORMATO OBLIGATORIO AL FINAL DE TU RESPUESTA:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\nESTRUCTURA (1H, 15M, 5M)\n- [Resumen de tendencia y liquidez]\n\nSETUP OPERATIVO\n- Accion: COMPRAR / VENDER / ESPERAR\n- Tipo de orden: MERCADO / LIMITE / NINGUNA\n- Entrada: $[precio]\n- Stop Loss: $[precio]\n- TP1: $[precio]\n- TP2: $[precio] (Si lo hay)\n- TP3: $[precio] (Si lo hay)\n- Gestion: [Ej: 100% TP1 o 50% TP1 50% TP2]\n- Razon: [Explica que confirmacion tecnica esperas o por que entras]\n==========================\nNOTA: Si la Accion es ESPERAR porque no hay setup claro, explica en "Razon" que confirmacion esperar. Aún así, SIEMPRE imprime el formato de tarjeta de arriba con la info disponible.';
 
   conversationHistory.push({ role: 'user', content: promptText });
   
@@ -826,8 +821,7 @@ function parsearSenal(text) {
     asset: null, price: null, entry: null, sl: null, 
     tp1: null, tp2: null, tp3: null, 
     p1: 100, p2: 0, p3: 0, 
-    direction: null, action: 'ESPERAR',
-    structure: null, sesgo: null, confidence: null, orderReason: null
+    direction: null, action: 'ESPERAR', orderType: 'limit', orderReason: null
   };
 
   var m = norm.match(/ANALISIS\s+([A-Z]+).*?\$([\d.,]+)/i);
@@ -837,7 +831,7 @@ function parsearSenal(text) {
     prices[data.asset] = data.price; 
   }
 
-  // DICCIONARIO ESTRICTO: Solo reconoce activos reales como respaldo, no palabras sueltas.
+  // RECONOCIMIENTO ACTIVO ESTRICTO
   if (!data.asset) {
     var knownAssets = ['BTC','ETH','SOL','XLM','XRP','HBAR','XAUUSDT','ADA','DOGE','AVAX','LINK','DOT','BNB','SUI','MATIC','UNI'];
     var regex = new RegExp('\\b(' + knownAssets.join('|') + ')\\b', 'i');
@@ -851,45 +845,49 @@ function parsearSenal(text) {
   else if (/\bSHORT\b|VENDER/i.test(norm)) { data.direction = 'SHORT'; data.action = 'VENDER'; } 
   else if (/\bESPERAR\b/i.test(norm)) { data.action = 'ESPERAR'; }
 
+  // DETECCION DE PRECIOS MEJORADA Y MÁS FLEXIBLE
   var getNum = (regex) => { 
     var mt = norm.match(regex); 
     return mt ? parseFloat(mt[1].replace(/,/g, '.')) : null; 
   };
   
-  data.entry = getNum(/[Ee]ntrada[:\s]+\$?([\d.,]+)/);
-  data.sl = getNum(/Stop\s*Loss[:\s]+\$?([\d.,]+)/i) || getNum(/SL[:\s]+\$?([\d.,]+)/i);
-  data.tp1 = getNum(/TP1[:\s]+\$?([\d.,]+)/i);
-  data.tp2 = getNum(/TP2[:\s]+\$?([\d.,]+)/i);
-  data.tp3 = getNum(/TP3[:\s]+\$?([\d.,]+)/i);
+  data.entry = getNum(/(?:Entrada|Entry).*?\$?\s*([\d.,]+)/i);
+  data.sl = getNum(/(?:Stop Loss|SL).*?\$?\s*([\d.,]+)/i);
+  data.tp1 = getNum(/TP1.*?\$?\s*([\d.,]+)/i);
+  data.tp2 = getNum(/TP2.*?\$?\s*([\d.,]+)/i);
+  data.tp3 = getNum(/TP3.*?\$?\s*([\d.,]+)/i);
 
-  var gest = norm.match(/Gestion.*?(?:(\d+)%\s*TP1).*?(?:(\d+)%\s*TP2)?.*?(?:(\d+)%\s*TP3)?/i);
-  if (gest) {
-    data.p1 = parseInt(gest[1]) || 100;
-    data.p2 = parseInt(gest[2]) || 0;
-    data.p3 = parseInt(gest[3]) || 0;
+  // DETECCION DE TIPO DE ORDEN
+  if (/Tipo(?:.*)?MERCADO/i.test(norm)) data.orderType = 'market';
+
+  // DETECCION DE GESTION Y PORCENTAJES
+  var gest1 = norm.match(/(\d+)%\s*TP1/i);
+  var gest2 = norm.match(/(\d+)%\s*TP2/i);
+  var gest3 = norm.match(/(\d+)%\s*TP3/i);
+
+  if (gest1 || gest2 || gest3) {
+    data.p1 = gest1 ? parseInt(gest1[1]) : 0;
+    data.p2 = gest2 ? parseInt(gest2[1]) : 0;
+    data.p3 = gest3 ? parseInt(gest3[1]) : 0;
+  } else if (data.tp2 && !data.tp3) {
+    data.p1 = 50; data.p2 = 50; // default 2 TPs
+  } else if (data.tp3) {
+    data.p1 = 30; data.p2 = 40; data.p3 = 30; // default 3 TPs
+  } else {
+    data.p1 = 100; // default 1 TP
   }
 
-  var strM = norm.match(/[Ee]structura[:\s]+(ALCISTA|BAJISTA|RANGO)/i);
-  if (strM) data.structure = strM[1].toUpperCase();
-
-  var sesM = norm.match(/[Ss]esgo.*?:[\s]+(ALCISTA|BAJISTA|NEUTRAL)/i);
-  if (sesM) data.sesgo = sesM[1].toUpperCase();
-
-  var confM = norm.match(/[Cc]onfianza[:\s]+([\d]+)\s*\/\s*10/);
-  if (confM) data.confidence = parseInt(confM[1]);
-
-  var reasonM = norm.match(/Razon:\s*([^\n]+)/i);
+  var reasonM = norm.match(/Razon(?:.*?):\s*([^\n]+)/i);
   if (reasonM) {
     data.orderReason = reasonM[1].trim();
   } else {
-    data.orderReason = data.action === 'ESPERAR' ? 'No hay setup claro. Espera confirmación.' : 'Condiciones estructurales válidas detectadas.';
+    data.orderReason = data.action === 'ESPERAR' ? 'Esperando confirmaciones técnicas en LTF.' : 'Setup válido según análisis SMC.';
   }
 
   return data;
 }
 
 function buildSignalCard(text, senal, rawText) {
-  // AHORA EL PANEL SALE SIEMPRE QUE SE HAYA DETECTADO UNA MONEDA
   if (!senal || !senal.asset) return null;
   
   var sym = senal.asset;
@@ -905,16 +903,19 @@ function buildSignalCard(text, senal, rawText) {
   else if (senal.direction === 'SHORT' || senal.action === 'VENDER') { badgeClass = 'badge-short'; badgeText = 'SHORT'; }
   else if (senal.action === 'ESPERAR') { badgeClass = 'badge-wait'; badgeText = 'ESPERAR'; }
 
-  var tpHtml = `
-    <div class="exec-field">
-      <label>TP1 $</label>
-      <div class="tp-multi-row">
-        <input type="text" id="exec-tp1-${uid}" value="${formatInp(senal.tp1)}"/>
-        <input type="number" id="exec-p1-${uid}" class="pct" value="${senal.p1}"/>
-      </div>
-    </div>`;
-    
-  if (senal.tp2 || senal.p2 > 0) {
+  // RENDERIZADO DINAMICO DE TPs (Solo los que existan)
+  var tpHtml = '';
+  if (senal.tp1 || (!senal.tp1 && !senal.tp2 && !senal.tp3)) { // Siempre al menos 1 TP
+    tpHtml += `
+      <div class="exec-field">
+        <label>TP1 $</label>
+        <div class="tp-multi-row">
+          <input type="text" id="exec-tp1-${uid}" value="${formatInp(senal.tp1)}"/>
+          <input type="number" id="exec-p1-${uid}" class="pct" value="${senal.p1}"/>
+        </div>
+      </div>`;
+  }
+  if (senal.tp2) {
     tpHtml += `
       <div class="exec-field">
         <label>TP2 $</label>
@@ -924,8 +925,7 @@ function buildSignalCard(text, senal, rawText) {
         </div>
       </div>`;
   }
-  
-  if (senal.tp3 || senal.p3 > 0) {
+  if (senal.tp3) {
     tpHtml += `
       <div class="exec-field">
         <label>TP3 $</label>
@@ -936,17 +936,59 @@ function buildSignalCard(text, senal, rawText) {
       </div>`;
   }
 
-  var analysisHtml = '';
-  if (senal.structure || senal.sesgo || senal.orderReason) {
-     analysisHtml += '<div class="signal-section">';
-     if (senal.orderReason) analysisHtml += '<div style="font-size:11px; color:var(--text2); line-height:1.5; margin-bottom:10px;"><b>Razón entrada:</b> ' + senal.orderReason + '</div>';
-     if (senal.structure) analysisHtml += '<div class="signal-row"><span class="signal-key">Estructura</span><span class="signal-val ' + (senal.structure === 'ALCISTA' ? 'up' : senal.structure === 'BAJISTA' ? 'down' : 'warn') + '">' + senal.structure + '</span></div>';
-     if (senal.sesgo) analysisHtml += '<div class="signal-row"><span class="signal-key">Fundamental</span><span class="signal-val ' + (senal.sesgo === 'ALCISTA' ? 'up' : senal.sesgo === 'BAJISTA' ? 'down' : 'neutral') + '">' + senal.sesgo + '</span></div>';
-     if (senal.confidence) analysisHtml += '<div class="signal-row"><span class="signal-key">Confianza</span><span class="signal-val" style="color:var(--text)">' + senal.confidence + '/10</span></div>';
-     var cleanText = rawText.replace(/\[INFO INTERNA DEL SISTEMA.*?\]/g, '').replace(/\*/g,'');
-     analysisHtml += '<hr class="signal-divider"><div style="font-size:11px; color:var(--text2); line-height:1.6; white-space:pre-wrap;">' + cleanText + '</div>';
-     analysisHtml += '</div>';
+  // ESTADO DE ESPERA (Si es ESPERAR y no hay niveles claros, ocultar ejecución)
+  var executePanelHtml = '';
+  if (senal.action !== 'ESPERAR' || (senal.action === 'ESPERAR' && senal.entry && senal.sl)) {
+    executePanelHtml = `
+      <div class="signal-execute">
+        <div class="exec-grid">
+          <div class="exec-field">
+            <label>USDT TOT.</label>
+            <input type="number" id="exec-usdt-${uid}" placeholder="Ej: 50" />
+          </div>
+          <div class="exec-field">
+            <label>ENTRADA $</label>
+            <input type="text" id="exec-entry-${uid}" class="live-entry-${sym}" value="${formatInp(ent)}" />
+          </div>
+          <div class="exec-field">
+            <label>APAL.</label>
+            <input type="number" id="exec-lev-${uid}" value="10" />
+          </div>
+          <div class="exec-field">
+            <label>SL $</label>
+            <input type="text" id="exec-sl-${uid}" value="${formatInp(senal.sl)}" />
+          </div>
+        </div>
+        
+        <div class="exec-grid" style="grid-template-columns:1fr; gap:2px;">
+          ${tpHtml}
+        </div>
+        
+        <div class="exec-type-row" id="exec-types-${uid}">
+          <div class="exec-type-btn ${senal.orderType === 'market' ? 'sel-market' : ''}" id="exec-market-${uid}" onclick="setExecOrderType('${sym}','${uid}','market')">MERCADO</div>
+          <div class="exec-type-btn ${senal.orderType === 'limit' ? 'sel-limit' : ''}" id="exec-limit-${uid}" onclick="setExecOrderType('${sym}','${uid}','limit')">LIMITE</div>
+        </div>
+        
+        <div class="exec-btns">
+          <button class="exec-btn-long" onclick="ejecutarDesdeCard('${sym}','${uid}','LONG', null, null, null, 10, '${senal.orderType}')">▲ ENTRAR LONG</button>
+          <button class="exec-btn-short" onclick="ejecutarDesdeCard('${sym}','${uid}','SHORT', null, null, null, 10, '${senal.orderType}')">▼ ENTRAR SHORT</button>
+        </div>
+      </div>
+    `;
+  } else {
+    executePanelHtml = `
+      <div style="padding:14px 18px; text-align:center; color:var(--warn); font-size:12px; font-family:'Space Mono', monospace; background:rgba(251, 191, 36, 0.05); border-top:1px solid var(--border2);">
+        ⏳ <b>MODO ESPERA:</b> No hay niveles seguros para operar ahora. Lee el análisis para saber qué confirmación estamos esperando.
+      </div>
+    `;
   }
+
+  var analysisHtml = '<div class="signal-section">';
+  if (senal.orderReason) analysisHtml += '<div style="font-size:12px; color:var(--text); line-height:1.5; margin-bottom:10px; background:rgba(255, 192, 0, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid var(--accent);"><b>💡 Plan:</b> ' + senal.orderReason + '</div>';
+  
+  var cleanText = rawText.replace(/\[INFO INTERNA DEL SISTEMA.*?\]/g, '').replace(/\*/g,'');
+  analysisHtml += '<div style="font-size:11px; color:var(--text2); line-height:1.6; white-space:pre-wrap;">' + cleanText + '</div>';
+  analysisHtml += '</div>';
 
   var html = `
   <div class="signal-card">
@@ -955,45 +997,10 @@ function buildSignalCard(text, senal, rawText) {
       <span class="signal-badge ${badgeClass}">${badgeText}</span>
     </div>
     
-    <div class="signal-execute">
-      <div class="exec-grid">
-        <div class="exec-field">
-          <label>USDT TOT.</label>
-          <input type="number" id="exec-usdt-${uid}" placeholder="Ej: 50" />
-        </div>
-        <div class="exec-field">
-          <label>ENTRADA $</label>
-          <input type="text" id="exec-entry-${uid}" class="live-entry-${sym}" value="${formatInp(ent)}" />
-        </div>
-        <div class="exec-field">
-          <label>APAL.</label>
-          <input type="number" id="exec-lev-${uid}" value="10" />
-        </div>
-        <div class="exec-field">
-          <label>SL $</label>
-          <input type="text" id="exec-sl-${uid}" value="${formatInp(senal.sl)}" />
-        </div>
-      </div>
-      
-      <div class="exec-grid" style="grid-template-columns:1fr; gap:2px;">
-        ${tpHtml}
-      </div>
-      
-      <div class="exec-type-row" id="exec-types-${uid}">
-        <div class="exec-type-btn sel-market" id="exec-market-${uid}" onclick="setExecOrderType('${sym}','${uid}','market')">MERCADO</div>
-        <div class="exec-type-btn" id="exec-limit-${uid}" onclick="setExecOrderType('${sym}','${uid}','limit')">LIMITE</div>
-      </div>
-      
-      <div class="exec-btns">
-        <button class="exec-btn-long" onclick="ejecutarDesdeCard('${sym}','${uid}','LONG', null, null, null, 10, 'market')">▲ ENTRAR LONG</button>
-        <button class="exec-btn-short" onclick="ejecutarDesdeCard('${sym}','${uid}','SHORT', null, null, null, 10, 'market')">▼ ENTRAR SHORT</button>
-      </div>
-    </div>
+    ${executePanelHtml}
     
-    ${analysisHtml ? `
     <div class="analysis-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent = this.nextElementSibling.classList.contains('show') ? '▲ Ocultar analisis' : '▼ Ver analisis completo';">▼ Ver analisis completo</div>
     <div class="analysis-content">${analysisHtml}</div>
-    ` : ''}
 
   </div>`;
   
