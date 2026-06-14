@@ -144,6 +144,7 @@ body {
 .btn-accent:hover { opacity: 0.9; }
 
 .cmd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.cmd-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
 .cmd-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 7px 5px; cursor: pointer; font-size: 10px; font-family: 'Space Mono', monospace; color: var(--text2); text-align: center; display: flex; align-items: center; justify-content: center; }
 .cmd-btn:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -365,16 +366,28 @@ body {
             <div class="cmd-btn" onclick="sendCmd('ANALIZA XAUUSDT')">ANALIZA ORO</div>
           </div>
           
-          <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">TOP CRYPTO</div>
-          <div class="cmd-grid">
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">ANALIZA BTC</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ANALIZA ETH</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">ANALIZA SOL</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA BNB')">ANALIZA BNB</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA ADA')">ANALIZA ADA</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA DOGE')">ANALIZA DOGE</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA AVAX')">ANALIZA AVAX</div>
-            <div class="cmd-btn" onclick="sendCmd('ANALIZA LINK')">ANALIZA LINK</div>
+          <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">TOP 20 CRYPTO</div>
+          <div class="cmd-grid-3">
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA BTC')">BTC</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA ETH')">ETH</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA BNB')">BNB</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA SOL')">SOL</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA XRP')">XRP</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA DOGE')">DOGE</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA TON')">TON</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA ADA')">ADA</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA SHIB')">SHIB</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA AVAX')">AVAX</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA TRX')">TRX</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA DOT')">DOT</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA BCH')">BCH</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA LINK')">LINK</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA NEAR')">NEAR</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA MATIC')">MATIC</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA ICP')">ICP</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA LTC')">LTC</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA UNI')">UNI</div>
+            <div class="cmd-btn" onclick="sendCmd('ANALIZA APT')">APT</div>
           </div>
 
           <div style="font-size:10px; color:var(--text2); margin-top:16px; margin-bottom:8px; font-family:'Space Mono', monospace;">CHAT & COMPARATIVAS</div>
@@ -847,7 +860,6 @@ function llamarClaude(promptText) {
     return showToast('Introduce Anthropic API Key', 'error'); 
   }
   
-  // AQUI OCURRE LA MAGIA: EL NUEVO PROMPT CON ANÁLISIS FUNDAMENTAL INTEGRADO
   var sp = 'Eres CryptoAdvisor, experto en SCALPING e INTRADIA. Analizas CUALQUIER criptomoneda combinando Análisis Fundamental y Técnico (SMC/ICT). Temporalidades: 1H, 15M y 5M.\n\nREGLAS VITALES:\n1. Usa SIEMPRE punto (.) para decimales. NUNCA comas.\n2. LONG: Stop Loss MENOR que Entrada. TPs MAYORES.\n3. SHORT: Stop Loss MAYOR que Entrada. TPs MENORES.\n\nFORMATO OBLIGATORIO AL FINAL DE TU RESPUESTA:\n==========================\nANALISIS [ACTIVO] | $[PRECIO]\n==========================\n📰 ANÁLISIS FUNDAMENTAL\n- [Resume el contexto macro, últimas narrativas, sentimiento de mercado y posibles catalizadores/noticias de este proyecto]\n\n📈 ESTRUCTURA TÉCNICA (1H, 15M, 5M)\n- [Resumen de tendencia y liquidez SMC/ICT]\n\n🎯 SETUP OPERATIVO\n- Accion: COMPRAR / VENDER / ESPERAR\n- Tipo de orden: MERCADO / LIMITE / NINGUNA\n- Entrada: $[precio]\n- Stop Loss: $[precio]\n- TP1: $[precio]\n- TP2: $[precio] (Si lo hay)\n- TP3: $[precio] (Si lo hay)\n- Gestion: [Ej: 100% TP1 o 50% TP1 50% TP2]\n- Razon: [Explica que confirmacion tecnica esperas o por que entras]\n==========================\nNOTA: Si la Accion es ESPERAR porque no hay setup claro, explica en "Razon" que confirmacion esperar. Aún así, SIEMPRE imprime el formato de tarjeta de arriba con la info disponible.';
 
   conversationHistory.push({ role: 'user', content: promptText });
@@ -897,7 +909,8 @@ function parsearSenal(text) {
   }
 
   if (!data.asset) {
-    var knownAssets = ['BTC','ETH','SOL','XLM','XRP','HBAR','XAUUSDT','ADA','DOGE','AVAX','LINK','DOT','BNB','SUI','MATIC','UNI'];
+    // Añadidos los nuevos activos para que el parseador no falle
+    var knownAssets = ['BTC','ETH','SOL','XLM','XRP','HBAR','XAUUSDT','ADA','DOGE','AVAX','LINK','DOT','BNB','SUI','MATIC','UNI','TON','SHIB','TRX','BCH','NEAR','ICP','LTC','APT'];
     var regex = new RegExp('\\b(' + knownAssets.join('|') + ')\\b', 'i');
     var am = norm.match(regex);
     if (am) data.asset = am[1].toUpperCase();
