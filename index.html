@@ -151,7 +151,6 @@ body {
 
 /* EJECUCION DENTRO DE CARD */
 .signal-execute { padding: 14px 18px; border-top: 1px solid var(--border2); background: rgba(255, 192, 0, .02); }
-.signal-execute-title { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; font-family: 'Space Mono', monospace; }
 .exec-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .exec-field label { font-size: 9px; color: var(--text3); display: block; margin-bottom: 3px; font-family: 'Space Mono', monospace; }
 .exec-field input { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 6px; padding: 7px 8px; color: var(--text); font-size: 12px; font-family: 'Space Mono', monospace; outline: none; }
@@ -213,15 +212,15 @@ body {
 .badge-wait { background: rgba(251, 191, 36, .2); color: var(--warn); border: 1px solid rgba(251, 191, 36, .4); }
 .badge-neutral { background: var(--surface2); color: var(--text3); border: 1px solid var(--border2); }
 
+/* WIDGET TRADINGVIEW */
+.tv-chart-container { height: 280px; width: 100%; border-bottom: 1px solid var(--border2); background: #131722; }
+
 /* ANALYSIS DESPLEGABLE */
 .analysis-toggle { background: var(--surface2); border-top: 1px solid var(--border2); padding: 10px; font-size: 10px; text-align: center; cursor: pointer; color: var(--text3); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.1em; user-select: none; transition: color 0.2s; }
 .analysis-toggle:hover { color: var(--accent); }
 .analysis-content { display: none; padding: 14px 18px; background: var(--surface); border-top: 1px solid var(--border2); }
 .analysis-content.show { display: block; }
 .signal-section { margin-bottom: 14px; }
-.signal-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; font-size: 13px; }
-.signal-key { color: var(--text2); min-width: 100px; flex-shrink: 0; font-size: 12px; }
-.signal-val { color: var(--text); font-weight: 500; }
 
 .order-confirm { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; width: 100%; }
 .order-confirm.success { border-color: rgba(74, 222, 128, .4); }
@@ -964,6 +963,7 @@ function buildSignalCard(text, senal, rawText) {
   if (!senal || !senal.asset) return null;
   
   var sym = senal.asset;
+  var cleanSym = sym === 'ORO' ? 'XAUUSDT' : sym;
   var uid = 'card_' + Date.now() + Math.floor(Math.random()*100);
   var pAct = prices[sym] || senal.price || 0;
   var ent = senal.entry || pAct;
@@ -975,6 +975,13 @@ function buildSignalCard(text, senal, rawText) {
   if (senal.direction === 'LONG' || senal.action === 'COMPRAR') { badgeClass = 'badge-long'; badgeText = 'LONG'; }
   else if (senal.direction === 'SHORT' || senal.action === 'VENDER') { badgeClass = 'badge-short'; badgeText = 'SHORT'; }
   else if (senal.action === 'ESPERAR') { badgeClass = 'badge-wait'; badgeText = 'ESPERAR'; }
+
+  // EL WIDGET DE TRADINGVIEW
+  var tvWidgetHtml = `
+    <div class="tv-chart-container">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_${uid}&symbol=BINANCE:${cleanSym}USDT&interval=15&symboledit=0&saveimage=0&toolbarbg=18181f&studies=%5B%5D&theme=dark&style=1&timezone=exchange&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=es" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen=""></iframe>
+    </div>
+  `;
 
   var tpHtml = '';
   if (senal.tp1 || (!senal.tp1 && !senal.tp2 && !senal.tp3)) { 
@@ -1067,6 +1074,8 @@ function buildSignalCard(text, senal, rawText) {
       <span class="signal-asset">${sym}/USDT</span>
       <span class="signal-badge ${badgeClass}">${badgeText}</span>
     </div>
+
+    ${tvWidgetHtml}
     
     ${executePanelHtml}
     
