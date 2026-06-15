@@ -288,7 +288,7 @@ body.active-bitunix .exec-type-row { grid-template-columns: 1fr 1fr !important; 
       <select id="loginExchange">
         <option value="Bitunix">Bitunix</option>
         <option value="BitMart">BitMart</option>
-        <option value="Pionex">Pionex Demo</option>
+        <option value="Pionex">Pionex</option>
       </select>
     </div>
     
@@ -348,7 +348,7 @@ body.active-bitunix .exec-type-row { grid-template-columns: 1fr 1fr !important; 
           <div class="exchange-selector">
             <div class="exch-btn active" id="btnBitunix" onclick="selectExchange('bitunix')">Bitunix</div>
             <div class="exch-btn" id="btnBitmart" onclick="selectExchange('bitmart')">BitMart</div>
-            <div class="exch-btn" id="btnPionex" onclick="selectExchange('pionex')">Pionex Demo</div>
+            <div class="exch-btn" id="btnPionex" onclick="selectExchange('pionex')">Pionex</div>
           </div>
           
           <div class="api-panel active" id="panel-bitunix">
@@ -604,7 +604,7 @@ function conectar() {
   var badge = document.getElementById('exchBadge');
   badge.style.display = 'inline-flex';
   badge.className = 'exch-badge ' + activeExchange;
-  badge.textContent = activeExchange === 'bitunix' ? 'Bitunix' : (activeExchange === 'bitmart' ? 'BitMart' : 'Pionex Demo');
+  badge.textContent = activeExchange === 'bitunix' ? 'Bitunix' : (activeExchange === 'bitmart' ? 'BitMart' : 'Pionex');
   
   showToast('Conectado y APIs guardadas', 'success');
   
@@ -850,7 +850,7 @@ function setExecOrderType(sym, uid, type) {
 
 function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml, lev, orderType, errMsg) {
   var w = document.getElementById('welcome'); if (w) w.style.display = 'none';
-  var exchName = activeExchange === 'bitunix' ? 'Bitunix' : (activeExchange === 'bitmart' ? 'BitMart' : 'Pionex Demo');
+  var exchName = activeExchange === 'bitunix' ? 'Bitunix' : (activeExchange === 'bitmart' ? 'BitMart' : 'Pionex');
   var otLabel = { market: 'MERCADO', limit: 'LÍMITE', stop_market: 'ACTIVADOR (STOP)' }; 
   var displayType = otLabel[orderType] || orderType.toUpperCase();
   
