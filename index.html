@@ -638,7 +638,6 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
-// ═════ NUEVA LÓGICA DE EJECUCIÓN (CON BOTÓN ACTIVADOR) ═════
 function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType) {
   var usdt = getVal('exec-usdt-' + uid);
   var entradaFinal = getVal('exec-entry-' + uid) || entrada;
@@ -650,7 +649,6 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   var precio = prices[sym] || entradaFinal;
   if (!precio) { showToast('Precio no disponible', 'error'); return; }
 
-  // LECTURA DIRECTA DE LA UI
   var otContainer = document.getElementById('exec-types-' + uid);
   var tipoOrden = 'limit'; 
   if (otContainer) {
@@ -661,7 +659,13 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     tipoOrden = orderType === 'market' ? 'market' : 'limit';
   }
 
+  var triggerPriceFinal = tipoOrden === 'stop_market' ? (getVal('exec-trigger-' + uid) || entradaFinal) : entradaFinal;
   var precioEjecucion = (tipoOrden === 'market') ? precio : entradaFinal;
+
+  if (tipoOrden === 'stop_market' && triggerPriceFinal <= 0) {
+    showToast('Introduce el precio de activación', 'error'); 
+    return;
+  }
 
   var tramos = [];
   var totalPct = 0;
@@ -712,7 +716,7 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
         orderBody.price = entradaFinal;
       } else if (tipoOrden === 'stop_market') {
         orderBody[otParam] = 'stop_market';
-        orderBody.triggerPrice = entradaFinal;
+        orderBody.triggerPrice = triggerPriceFinal;
         orderBody.price = entradaFinal; 
       }
       
@@ -739,6 +743,11 @@ function setExecOrderType(sym, uid, type) {
   var btn = document.getElementById('exec-' + type + '-' + uid);
   if (btn) btn.classList.add(type === 'trigger' ? 'sel-trigger' : 'sel-' + type);
   
+  var actField = document.getElementById('exec-act-field-' + uid);
+  if (actField) {
+    actField.style.display = type === 'trigger' ? 'block' : 'none';
+  }
+
   if (type === 'market' && prices[sym]) {
      var entryInput = document.getElementById('exec-entry-' + uid);
      if (entryInput) entryInput.value = prices[sym].toFixed(5);
@@ -1028,6 +1037,10 @@ function buildSignalCard(text, senal, rawText) {
           <div class="exec-field">
             <label>ENTRADA $</label>
             <input type="text" id="exec-entry-${uid}" class="live-entry-${sym}" value="${formatInp(ent)}" />
+          </div>
+          <div class="exec-field" id="exec-act-field-${uid}" style="display: none;">
+            <label>ACTIVACIÓN $</label>
+            <input type="text" id="exec-trigger-${uid}" value="${formatInp(ent)}" />
           </div>
           <div class="exec-field">
             <label>APAL.</label>
