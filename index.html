@@ -21,6 +21,7 @@
   --up: #4ade80;
   --down: #f87171;
   --warn: #fbbf24;
+  --trigger: #a855f7;
   --radius: 12px;
   --radius-sm: 8px;
 }
@@ -158,10 +159,11 @@ body {
 .exec-field input:focus { border-color: var(--accent); }
 .tp-multi-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
 .tp-multi-row input.pct { width: 50px; text-align: center; background: rgba(255, 192, 0, .1); color: var(--accent); border-color: rgba(255, 192, 0, .3); }
-.exec-type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.exec-type-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
 .exec-type-btn { padding: 7px 4px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace; text-align: center; border: 1px solid var(--border2); background: var(--bg); color: var(--text3); transition: all .15s; }
 .exec-type-btn.sel-market { border-color: var(--accent); color: var(--accent); background: rgba(255, 192, 0, .08); }
 .exec-type-btn.sel-limit { border-color: #00aae4; color: #00aae4; background: rgba(0, 170, 228, .08); }
+.exec-type-btn.sel-trigger { border-color: var(--trigger); color: var(--trigger); background: rgba(168, 85, 247, .08); }
 .exec-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .exec-btn-long { background: rgba(74, 222, 128, .15); color: var(--up); border: 1px solid rgba(74, 222, 128, .4); padding: 10px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; }
 .exec-btn-long:hover { background: rgba(74, 222, 128, .25); }
@@ -636,7 +638,7 @@ function bitmartReq(ep, body) {
   return srvReq(RENDER_SERVER + '/' + ep, body);
 }
 
-// ═════ NUEVA LÓGICA DE EJECUCIÓN MULTI-TP FRACCIONADA Y LIMITE INTELIGENTE ═════
+// ═════ NUEVA LÓGICA DE EJECUCIÓN (CON BOTÓN ACTIVADOR) ═════
 function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType) {
   var usdt = getVal('exec-usdt-' + uid);
   var entradaFinal = getVal('exec-entry-' + uid) || entrada;
@@ -648,21 +650,18 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   var precio = prices[sym] || entradaFinal;
   if (!precio) { showToast('Precio no disponible', 'error'); return; }
 
-  var ot = document.querySelector('#exec-types-' + uid + ' .sel-market, #exec-types-' + uid + ' .sel-limit');
-  var esMercado = ot ? ot.classList.contains('sel-market') : (orderType === 'market');
+  // LECTURA DIRECTA DE LA UI
+  var otContainer = document.getElementById('exec-types-' + uid);
   var tipoOrden = 'limit'; 
-
-  if (esMercado) {
-    tipoOrden = 'market';
+  if (otContainer) {
+    if (otContainer.querySelector('.sel-market')) tipoOrden = 'market';
+    else if (otContainer.querySelector('.sel-trigger')) tipoOrden = 'stop_market';
+    else if (otContainer.querySelector('.sel-limit')) tipoOrden = 'limit';
   } else {
-    if (side === 'LONG') {
-      tipoOrden = (entradaFinal > precio) ? 'stop_market' : 'limit';
-    } else {
-      tipoOrden = (entradaFinal < precio) ? 'stop_market' : 'limit';
-    }
+    tipoOrden = orderType === 'market' ? 'market' : 'limit';
   }
 
-  var precioEjecucion = esMercado ? precio : entradaFinal;
+  var precioEjecucion = (tipoOrden === 'market') ? precio : entradaFinal;
 
   var tramos = [];
   var totalPct = 0;
@@ -711,7 +710,7 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
       } else if (tipoOrden === 'limit') {
         orderBody[otParam] = 'limit';
         orderBody.price = entradaFinal;
-      } else {
+      } else if (tipoOrden === 'stop_market') {
         orderBody[otParam] = 'stop_market';
         orderBody.triggerPrice = entradaFinal;
         orderBody.price = entradaFinal; 
@@ -727,7 +726,7 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     
     var tpListHtml = tramos.map((t, i) => 'TP' + (i+1) + ' (' + t.pct + '%): <span style="color:var(--up)">$' + t.price + '</span>').join('<br>');
     
-    mostrarResultadoOrdenMulti(allOk, side, sym, usdt, precioEjecucion, slFinal, tpListHtml, lev, tipoOrden.toUpperCase(), allOk ? 'Ejecutado correctamente' : msg);
+    mostrarResultadoOrdenMulti(allOk, side, sym, usdt, precioEjecucion, slFinal, tpListHtml, lev, tipoOrden, allOk ? 'Ejecutado correctamente' : msg);
     fetchPositions();
   }).catch(function(e) {
     showToast('Error de red al enviar', 'error');
@@ -736,9 +735,9 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
 function setExecOrderType(sym, uid, type) {
   var btns = document.querySelectorAll('#exec-types-' + uid + ' .exec-type-btn');
-  if (btns) { btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit'); }); }
+  if (btns) { btns.forEach(function(b) { b.classList.remove('sel-market','sel-limit','sel-trigger'); }); }
   var btn = document.getElementById('exec-' + type + '-' + uid);
-  if (btn) btn.classList.add('sel-' + type);
+  if (btn) btn.classList.add(type === 'trigger' ? 'sel-trigger' : 'sel-' + type);
   
   if (type === 'market' && prices[sym]) {
      var entryInput = document.getElementById('exec-entry-' + uid);
@@ -749,18 +748,20 @@ function setExecOrderType(sym, uid, type) {
 function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml, lev, orderType, errMsg) {
   var w = document.getElementById('welcome'); if (w) w.style.display = 'none';
   var exchName = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
-  var otLabel = { market: 'MERCADO', limit: 'LIMITE', stop_market: 'STOP-MARKET (TRIGGER)' }; 
+  var otLabel = { market: 'MERCADO', limit: 'LÍMITE', stop_market: 'ACTIVADOR (STOP)' }; 
+  var displayType = otLabel[orderType] || orderType.toUpperCase();
+  
   var div = document.createElement('div');
   div.className = 'msg msg-ai';
   if (ok) {
     div.innerHTML = '<div class="msg-label">ORDEN ENVIADA</div><div class="order-confirm success">' +
-      '<div style="font-size:13px;font-weight:600;color:var(--up);margin-bottom:8px;">OK ' + side + ' ' + sym + ' (' + (otLabel[orderType.toLowerCase()] || orderType.toUpperCase()) + ') en ' + exchName + '</div>' +
+      '<div style="font-size:13px;font-weight:600;color:var(--up);margin-bottom:8px;">OK ' + side + ' ' + sym + ' (' + displayType + ') en ' + exchName + '</div>' +
       '<div class="order-detail-grid" style="grid-template-columns: 1fr;">' +
       '<div class="order-detail">Capital Total: <span>$' + usdt + '</span> · Apal: <span>' + lev + 'x</span></div>' +
       '<div class="order-detail">Precio: <span>~$' + precio.toFixed(4) + '</span> · SL: <span style="color:var(--down)">$' + (sl || '--') + '</span></div>' +
       '<div class="order-detail" style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border2); line-height:1.6;"><b>Fraccionamiento Take Profit:</b><br>' + tpListHtml + '</div>' +
       '</div></div>';
-    showToast('Orden ' + (otLabel[orderType.toLowerCase()] || orderType.toUpperCase()) + ' enviada y dividida', 'success');
+    showToast('Orden ' + displayType + ' enviada y dividida', 'success');
   } else {
     div.innerHTML = '<div class="msg-label">ERROR</div><div class="order-confirm error">' +
       '<div style="font-size:13px;font-weight:600;color:var(--down);">Error en ' + exchName + '</div>' +
@@ -909,7 +910,6 @@ function parsearSenal(text) {
   }
 
   if (!data.asset) {
-    // Añadidos los nuevos activos para que el parseador no falle
     var knownAssets = ['BTC','ETH','SOL','XLM','XRP','HBAR','XAUUSDT','ADA','DOGE','AVAX','LINK','DOT','BNB','SUI','MATIC','UNI','TON','SHIB','TRX','BCH','NEAR','ICP','LTC','APT'];
     var regex = new RegExp('\\b(' + knownAssets.join('|') + ')\\b', 'i');
     var am = norm.match(regex);
@@ -1043,9 +1043,10 @@ function buildSignalCard(text, senal, rawText) {
           ${tpHtml}
         </div>
         
-        <div class="exec-type-row" id="exec-types-${uid}">
+        <div class="exec-type-row" id="exec-types-${uid}" style="grid-template-columns: 1fr 1fr 1fr;">
           <div class="exec-type-btn ${senal.orderType === 'market' ? 'sel-market' : ''}" id="exec-market-${uid}" onclick="setExecOrderType('${sym}','${uid}','market')">MERCADO</div>
-          <div class="exec-type-btn ${senal.orderType === 'limit' ? 'sel-limit' : ''}" id="exec-limit-${uid}" onclick="setExecOrderType('${sym}','${uid}','limit')">LIMITE</div>
+          <div class="exec-type-btn ${senal.orderType === 'limit' ? 'sel-limit' : ''}" id="exec-limit-${uid}" onclick="setExecOrderType('${sym}','${uid}','limit')">LÍMITE</div>
+          <div class="exec-type-btn" id="exec-trigger-${uid}" onclick="setExecOrderType('${sym}','${uid}','trigger')">ACTIVADOR</div>
         </div>
         
         <div class="exec-btns">
