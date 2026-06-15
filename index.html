@@ -786,7 +786,10 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
   var totalRawQty = usdt * lev / precioEjecucion;
   var reqFn = activeExchange === 'bitunix' ? bitunixReq : (activeExchange === 'bitmart' ? bitmartReq : pionexReq);
-  var symParam = activeExchange === 'bitunix' ? sym + 'USDT' : (activeExchange === 'bitmart' ? sym + '_USDT' : sym + 'USDT');
+  
+  // AQUI METEMOS LA MAGIA: EL SÍMBOLO ESPECIAL DE FUTUROS PARA PIONEX
+  var symParam = activeExchange === 'bitunix' ? sym + 'USDT' : (activeExchange === 'bitmart' ? sym + '_USDT' : sym + '_USDT_PERP');
+  
   var qtyParam = activeExchange === 'bitunix' ? 'qty' : 'size';
   var otParam = activeExchange === 'bitunix' ? 'orderType' : 'type';
 
