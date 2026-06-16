@@ -602,11 +602,12 @@ function switchLoginTab(tab) {
 function doRegister() {
   var email = document.getElementById('regEmail').value.trim();
   var uid = document.getElementById('regUid').value.trim();
+  var telegramUser = document.getElementById('regTelegram').value.trim();
   var exchange = document.getElementById('regExchange').value;
   var btn = document.getElementById('regBtn');
   var errorEl = document.getElementById('loginError');
 
-  if (!email || !uid) { 
+  if (!email || !uid || !telegramUser) { 
       showLoginError('Por favor, rellena todos los campos'); 
       return; 
   }
@@ -618,7 +619,7 @@ function doRegister() {
   fetch(RENDER_SERVER + '/registro', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, uid: uid, exchange: exchange })
+    body: JSON.stringify({ email: email, uid: uid, exchange: exchange, telegramUser: telegramUser })
   }).then(function(r) {
     return r.json();
   }).then(function(data) {
@@ -635,7 +636,7 @@ function doRegister() {
       btn.textContent = 'Enviar Solicitud';
     }
   }).catch(function(e) {
-    showLoginError('El servidor de Render se está encendiendo. Espera 10 segundos y vuelve a darle a Enviar.');
+    showLoginError('El servidor está procesando. Espera unos segundos y vuelve a darle.');
     btn.disabled = false;
     btn.textContent = 'Enviar Solicitud';
   });
