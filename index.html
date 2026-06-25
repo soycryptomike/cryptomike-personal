@@ -1778,7 +1778,7 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
   var totalRawQty = usdt * lev / precioEjecucion;
   var reqFn = activeExchange === 'bitunix' ? bitunixReq : bitmartReq;
-  var symParam = activeExchange === 'bitunix' ? sym + 'USDT' : sym + '_USDT';
+  var symParam = sym + 'USDT';
   var qtyParam = activeExchange === 'bitunix' ? 'qty' : 'size';
   var otParam = activeExchange === 'bitunix' ? 'orderType' : 'type';
 
