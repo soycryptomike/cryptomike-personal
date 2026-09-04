@@ -369,32 +369,6 @@ body.active-bitunix .exec-type-row {
     border-color: var(--accent); 
 }
 
-.exchange-selector { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 6px; 
-    margin-bottom: 10px; 
-}
-
-.exch-btn { 
-    background: var(--surface2); 
-    border: 1px solid var(--border2); 
-    border-radius: var(--radius-sm); 
-    padding: 8px; 
-    cursor: pointer; 
-    font-size: 12px; 
-    font-weight: 600; 
-    font-family: 'Space Mono', monospace; 
-    color: var(--text3); 
-    text-align: center; 
-}
-
-.exch-btn.active { 
-    border-color: var(--accent); 
-    color: var(--accent); 
-    background: rgba(255, 192, 0, .06); 
-}
-
 .api-panel { 
     display: none; 
 } 
@@ -1092,12 +1066,6 @@ body.active-bitunix .exec-type-row {
     border: 1px solid rgba(255, 192, 0, .2); 
 }
 
-.exch-badge.bitmart { 
-    background: rgba(0, 174, 228, .1); 
-    color: #00aae4; 
-    border: 1px solid rgba(0, 174, 228, .2); 
-}
-
 @media (max-width: 768px) {
   .main { 
       display: flex; 
@@ -1129,7 +1097,6 @@ body.active-bitunix .exec-type-row {
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <!-- Mantenemos el PNG original aquí -->
       <img src="logo.png" alt="CM Logo" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
     </div>
     <div class="login-title">CryptoMikeBot</div>
@@ -1146,7 +1113,6 @@ body.active-bitunix .exec-type-row {
         <label>Exchange que usas</label>
         <select id="loginExchange">
           <option value="Bitunix">Bitunix</option>
-          <option value="BitMart">BitMart</option>
         </select>
       </div>
       <div class="login-field">
@@ -1166,7 +1132,7 @@ body.active-bitunix .exec-type-row {
       
       <div style="text-align:left; background:rgba(255,192,0,0.05); border:1px solid rgba(255,192,0,0.2); padding:14px; border-radius:8px; margin-bottom:16px; font-size:11.5px; line-height:1.6; color:var(--text2); font-family:'Space Grotesk', sans-serif;">
         <div style="color:var(--accent); margin-bottom:8px; font-weight:700; font-family:'Space Mono', monospace; font-size:10px;">PASOS PARA ENTRAR AL VIP:</div>
-        <div style="margin-bottom:6px;"><b>1.</b> Regístrate con mi enlace en <a href="https://www.bitunix.com/register?vipCode=QsUs" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">Bitunix</a> o <a href="https://www.bitmart.com/es-ES/invite/Cryptomike" target="_blank" style="color:#00aae4; text-decoration:none; font-weight:bold;">BitMart</a>.</div>
+        <div style="margin-bottom:6px;"><b>1.</b> Regístrate con mi enlace en <a href="https://www.bitunix.com/register?vipCode=QsUs" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">Bitunix</a>.</div>
         <div style="margin-bottom:6px;"><b>2.</b> Haz un depósito y realiza tu primera operativa.</div>
         <div><b>3.</b> Rellena esta solicitud. El equipo revisará tu UID.</div>
       </div>
@@ -1175,7 +1141,6 @@ body.active-bitunix .exec-type-row {
         <label>Exchange a registrar</label>
         <select id="regExchange">
           <option value="Bitunix">Bitunix</option>
-          <option value="BitMart">BitMart</option>
         </select>
       </div>
       <div class="login-field">
@@ -1201,7 +1166,6 @@ body.active-bitunix .exec-type-row {
   <header class="header">
     <div class="logo">
       <div class="logo-mark">
-        <!-- PNG Original -->
         <img src="logo.png" alt="CM" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
       </div>
       <div>
@@ -1235,19 +1199,9 @@ body.active-bitunix .exec-type-row {
           </div>
           <div class="field"><label>ANTHROPIC API KEY</label><input type="password" id="anthropicKey" placeholder="sk-ant-..." /></div>
           
-          <div class="exchange-selector">
-            <div class="exch-btn active" id="btnBitunix" onclick="selectExchange('bitunix')">Bitunix</div>
-            <div class="exch-btn" id="btnBitmart" onclick="selectExchange('bitmart')">BitMart</div>
-          </div>
-          
-          <div class="api-panel active" id="panel-bitunix">
-            <div class="field"><input type="password" id="bitunixKey" placeholder="API Key..." /></div>
-            <div class="field"><input type="password" id="bitunixSecret" placeholder="Secret Key..." /></div>
-          </div>
-          <div class="api-panel" id="panel-bitmart">
-            <div class="field"><input type="password" id="bitmartKey" placeholder="API Key..." /></div>
-            <div class="field"><input type="password" id="bitmartSecret" placeholder="Secret Key..." /></div>
-            <div class="field"><input type="text" id="bitmartMemo" placeholder="Memo..." /></div>
+          <div class="api-panel active" id="panel-bitunix" style="margin-top: 10px;">
+            <div class="field"><input type="password" id="bitunixKey" placeholder="Bitunix API Key..." /></div>
+            <div class="field"><input type="password" id="bitunixSecret" placeholder="Bitunix Secret Key..." /></div>
           </div>
           
           <button class="btn btn-accent" onclick="conectar()">Conectar Sistema</button>
@@ -1316,7 +1270,6 @@ body.active-bitunix .exec-type-row {
       <div class="chat-area" id="chatArea">
         <div class="welcome" id="welcome">
           <div class="welcome-logo">
-            <!-- PNG Original -->
             <img src="logo.png" alt="CM Logo" onerror="this.style.display='none'; this.parentNode.innerText='CM';">
           </div>
           <h2>CryptoMikeBot</h2>
@@ -1446,7 +1399,7 @@ function checkSessionExpiry() {
 setInterval(checkSessionExpiry, 60000);
 
 function loadSavedData() {
-  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'bitmartKey', 'bitmartSecret', 'bitmartMemo'];
+  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret'];
   fields.forEach(function(f) {
     var val = localStorage.getItem('cm_' + f);
     if (val) {
@@ -1486,7 +1439,6 @@ function doLogin() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appScreen').style.display = 'block';
       
-      selectExchange(exchange.toLowerCase());
       localStorage.setItem('cm_login_period', getCurrentPeriod());
       loadSavedData();
       
@@ -1530,18 +1482,6 @@ function getVal(id) {
   return parseFloat(val) || 0; 
 }
 
-function selectExchange(ex) {
-  activeExchange = ex;
-  document.body.className = 'active-' + ex; 
-  
-  ['bitunix', 'bitmart'].forEach(function(e) {
-    var btn = document.getElementById('btn' + e.charAt(0).toUpperCase() + e.slice(1));
-    var panel = document.getElementById('panel-' + e);
-    if(btn) btn.classList.toggle('active', e === ex);
-    if(panel) panel.classList.toggle('active', e === ex);
-  });
-}
-
 function sideTab(el, panelId) {
   document.querySelectorAll('.tab').forEach(function(t) { 
       t.classList.remove('active'); 
@@ -1560,7 +1500,7 @@ function conectar() {
       return; 
   }
   
-  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'bitmartKey', 'bitmartSecret', 'bitmartMemo'];
+  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret'];
   fields.forEach(function(f) {
     localStorage.setItem('cm_' + f, document.getElementById(f).value.trim());
   });
@@ -1570,8 +1510,8 @@ function conectar() {
   
   var badge = document.getElementById('exchBadge');
   badge.style.display = 'inline-flex';
-  badge.className = 'exch-badge ' + activeExchange;
-  badge.textContent = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
+  badge.className = 'exch-badge bitunix';
+  badge.textContent = 'Bitunix';
   
   showToast('Conectado y APIs guardadas', 'success');
   
@@ -1631,22 +1571,8 @@ function bitunixReq(ep, body) {
   return srvReq(RENDER_SERVER + '/bitunix/' + ep, body);
 }
 
-function bitmartReq(ep, body) {
-  var apiKey = document.getElementById('bitmartKey').value.trim();
-  var secret = document.getElementById('bitmartSecret').value.trim();
-  var memo = document.getElementById('bitmartMemo').value.trim() || '';
-  if (!apiKey || !secret) { 
-      showToast('Introduce BitMart credenciales', 'error'); 
-      return Promise.resolve(null); 
-  }
-  body.apiKey = apiKey; 
-  body.secret = secret; 
-  body.memo = memo;
-  return srvReq(RENDER_SERVER + '/' + ep, body);
-}
-
 function fetchOrders() {
-  var req = activeExchange === 'bitunix' ? bitunixReq('orders', {}) : bitmartReq('orders', {});
+  var req = bitunixReq('orders', {});
   req.then(function(res) {
     var orders = [];
     if (res && res.data && res.data.length) {
@@ -1686,16 +1612,12 @@ function fetchOrders() {
 }
 
 function fetchPositions() {
-  var p = activeExchange === 'bitunix' ? bitunixReq('positions', {}) : bitmartReq('positions', {});
+  var p = bitunixReq('positions', {});
   p.then(function(res) {
     var positions = [];
-    if (activeExchange === 'bitunix' && res && res.code === 0 && res.data && res.data.length) {
+    if (res && res.code === 0 && res.data && res.data.length) {
       positions = res.data.map(function(p) {
         return { symbol: p.symbol, side: p.side === 'LONG' ? 'LONG' : 'SHORT', entry: parseFloat(p.avgOpenPrice || 0), qty: p.qty, liq: parseFloat(p.liqPrice || 0), lev: p.leverage, pnl: parseFloat(p.unrealizedPNL || 0) };
-      });
-    } else if (activeExchange === 'bitmart' && res && res.code === 1000 && res.data && res.data.length) {
-      positions = res.data.map(function(p) {
-        return { symbol: p.symbol, side: p.position_type === 1 ? 'LONG' : 'SHORT', entry: parseFloat(p.avg_price || 0), qty: p.current_amount, liq: parseFloat(p.liquidation_price || 0), lev: p.leverage, pnl: parseFloat(p.unrealized_value || 0) };
       });
     }
     
@@ -1777,15 +1699,15 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   }
 
   var totalRawQty = usdt * lev / precioEjecucion;
-  var reqFn = activeExchange === 'bitunix' ? bitunixReq : bitmartReq;
+  var reqFn = bitunixReq;
   var symParam = sym + 'USDT';
-  var qtyParam = activeExchange === 'bitunix' ? 'qty' : 'size';
-  var otParam = activeExchange === 'bitunix' ? 'orderType' : 'type';
+  var qtyParam = 'qty';
+  var otParam = 'orderType';
 
-  var levBody = activeExchange === 'bitunix' ? { symbol: symParam, leverage: lev } : { symbol: symParam, leverage: lev, openType: 'isolated' };
+  var levBody = { symbol: symParam, leverage: lev };
 
   reqFn('leverage', levBody).then(function() {
-    showToast('Enviando órdenes (' + tramos.length + ' tramos) a ' + activeExchange + '...', '');
+    showToast('Enviando órdenes (' + tramos.length + ' tramos) a Bitunix...', '');
     
     var promises = tramos.map(function(tramo, index) {
       var qtyTranche = parseFloat((totalRawQty * (tramo.pct / 100)).toFixed(5));
@@ -1858,7 +1780,7 @@ function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml,
   var w = document.getElementById('welcome'); 
   if (w) w.style.display = 'none';
   
-  var exchName = activeExchange === 'bitunix' ? 'Bitunix' : 'BitMart';
+  var exchName = 'Bitunix';
   var otLabel = { market: 'MERCADO', limit: 'LÍMITE', stop_market: 'ACTIVADOR (STOP)' }; 
   var displayType = otLabel[orderType] || orderType.toUpperCase();
   
@@ -2016,9 +1938,6 @@ function parsearSenal(text) {
     orderReason: null
   };
 
-  // =======================================================
-  // AQUÍ ESTÁ EL ARREGLO DE LA COMA PARA EL BITCOIN
-  // =======================================================
   var m = norm.match(/ANALISIS\s+([A-Z]+).*?\$([\d.,]+)/i);
   if (m) { 
     data.asset = m[1]; 
@@ -2045,9 +1964,6 @@ function parsearSenal(text) {
       data.action = 'ESPERAR'; 
   }
 
-  // =======================================================
-  // AQUÍ TAMBIÉN IGNORA LA COMA EN LAS ENTRADAS Y TPs
-  // =======================================================
   var getNum = function(regex) { 
     var mt = norm.match(regex); 
     return mt ? parseFloat(mt[1].replace(/,/g, '')) : null; 
