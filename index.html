@@ -1710,7 +1710,15 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
     showToast('Enviando órdenes (' + tramos.length + ' tramos) a Bitunix...', '');
     
     var promises = tramos.map(function(tramo, index) {
-      var qtyTranche = parseFloat((totalRawQty * (tramo.pct / 100)).toFixed(5));
+      
+      // Ajuste dinámico de decimales para evitar el Parameter Error en altcoins
+      var decimalesQty = 0; // Por defecto cantidades enteras para XRP, XLM, DOGE, etc.
+      if (sym === 'BTC') decimalesQty = 3;
+      else if (sym === 'ETH') decimalesQty = 2;
+      else if (sym === 'SOL') decimalesQty = 1;
+      
+      var qtyTranche = parseFloat((totalRawQty * (tramo.pct / 100)).toFixed(decimalesQty));
+      
       if (qtyTranche <= 0) {
           return Promise.resolve({ error: 'Cantidad muy pequeña en un tramo' });
       }
