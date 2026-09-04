@@ -39,7 +39,7 @@ body {
   min-height: 100vh;
 }
 
-/* MAGIA: OCULTAR ACTIVADOR EN BITUNIX */
+/* MAGIA: OCULTAR ACTIVADOR EN BITUNIX/WEEX (Ajustable según API) */
 body.active-bitunix .exec-trigger-btn { 
     display: none !important; 
 }
@@ -367,6 +367,32 @@ body.active-bitunix .exec-type-row {
 
 .field input:focus, .field select:focus { 
     border-color: var(--accent); 
+}
+
+.exchange-selector { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 6px; 
+    margin-bottom: 10px; 
+}
+
+.exch-btn { 
+    background: var(--surface2); 
+    border: 1px solid var(--border2); 
+    border-radius: var(--radius-sm); 
+    padding: 8px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    font-weight: 600; 
+    font-family: 'Space Mono', monospace; 
+    color: var(--text3); 
+    text-align: center; 
+}
+
+.exch-btn.active { 
+    border-color: var(--accent); 
+    color: var(--accent); 
+    background: rgba(255, 192, 0, .06); 
 }
 
 .api-panel { 
@@ -1066,6 +1092,12 @@ body.active-bitunix .exec-type-row {
     border: 1px solid rgba(255, 192, 0, .2); 
 }
 
+.exch-badge.weex { 
+    background: rgba(168, 85, 247, .1); 
+    color: var(--trigger); 
+    border: 1px solid rgba(168, 85, 247, .2); 
+}
+
 @media (max-width: 768px) {
   .main { 
       display: flex; 
@@ -1113,6 +1145,7 @@ body.active-bitunix .exec-type-row {
         <label>Exchange que usas</label>
         <select id="loginExchange">
           <option value="Bitunix">Bitunix</option>
+          <option value="Weex">Weex</option>
         </select>
       </div>
       <div class="login-field">
@@ -1132,7 +1165,7 @@ body.active-bitunix .exec-type-row {
       
       <div style="text-align:left; background:rgba(255,192,0,0.05); border:1px solid rgba(255,192,0,0.2); padding:14px; border-radius:8px; margin-bottom:16px; font-size:11.5px; line-height:1.6; color:var(--text2); font-family:'Space Grotesk', sans-serif;">
         <div style="color:var(--accent); margin-bottom:8px; font-weight:700; font-family:'Space Mono', monospace; font-size:10px;">PASOS PARA ENTRAR AL VIP:</div>
-        <div style="margin-bottom:6px;"><b>1.</b> Regístrate con mi enlace en <a href="https://www.bitunix.com/register?vipCode=QsUs" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">Bitunix</a>.</div>
+        <div style="margin-bottom:6px;"><b>1.</b> Regístrate con mi enlace en <a href="https://www.bitunix.com/register?vipCode=QsUs" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">Bitunix</a> o Weex.</div>
         <div style="margin-bottom:6px;"><b>2.</b> Haz un depósito y realiza tu primera operativa.</div>
         <div><b>3.</b> Rellena esta solicitud. El equipo revisará tu UID.</div>
       </div>
@@ -1141,6 +1174,7 @@ body.active-bitunix .exec-type-row {
         <label>Exchange a registrar</label>
         <select id="regExchange">
           <option value="Bitunix">Bitunix</option>
+          <option value="Weex">Weex</option>
         </select>
       </div>
       <div class="login-field">
@@ -1199,12 +1233,23 @@ body.active-bitunix .exec-type-row {
           </div>
           <div class="field"><label>ANTHROPIC API KEY</label><input type="password" id="anthropicKey" placeholder="sk-ant-..." /></div>
           
+          <div class="exchange-selector" style="margin-top: 10px;">
+            <div class="exch-btn active" id="btnBitunix" onclick="selectExchange('bitunix')">Bitunix</div>
+            <div class="exch-btn" id="btnWeex" onclick="selectExchange('weex')">Weex</div>
+          </div>
+
           <div class="api-panel active" id="panel-bitunix" style="margin-top: 10px;">
             <div class="field"><input type="password" id="bitunixKey" placeholder="Bitunix API Key..." /></div>
             <div class="field"><input type="password" id="bitunixSecret" placeholder="Bitunix Secret Key..." /></div>
           </div>
           
-          <button class="btn btn-accent" onclick="conectar()">Conectar Sistema</button>
+          <div class="api-panel" id="panel-weex" style="margin-top: 10px;">
+            <div class="field"><input type="password" id="weexKey" placeholder="Weex API Key..." /></div>
+            <div class="field"><input type="password" id="weexSecret" placeholder="Weex Secret Key..." /></div>
+            <div class="field"><input type="password" id="weexPassphrase" placeholder="Weex Passphrase (Clave API)..." /></div>
+          </div>
+
+          <button class="btn btn-accent" onclick="conectar()" style="margin-top:10px;">Conectar Sistema</button>
         </div>
       </div>
 
@@ -1339,6 +1384,18 @@ function switchLoginTab(tab) {
   }
 }
 
+function selectExchange(ex) {
+  activeExchange = ex;
+  document.body.className = 'active-' + ex;
+  
+  ['bitunix', 'weex'].forEach(function(e) {
+    var btn = document.getElementById('btn' + e.charAt(0).toUpperCase() + e.slice(1));
+    var panel = document.getElementById('panel-' + e);
+    if(btn) btn.classList.toggle('active', e === ex);
+    if(panel) panel.classList.toggle('active', e === ex);
+  });
+}
+
 function doRegister() {
   var email = document.getElementById('regEmail').value.trim();
   var uid = document.getElementById('regUid').value.trim();
@@ -1399,11 +1456,12 @@ function checkSessionExpiry() {
 setInterval(checkSessionExpiry, 60000);
 
 function loadSavedData() {
-  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret'];
+  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'weexKey', 'weexSecret', 'weexPassphrase'];
   fields.forEach(function(f) {
     var val = localStorage.getItem('cm_' + f);
     if (val) {
-        document.getElementById(f).value = val;
+        var el = document.getElementById(f);
+        if(el) el.value = val;
     }
   });
 }
@@ -1439,6 +1497,7 @@ function doLogin() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appScreen').style.display = 'block';
       
+      selectExchange(exchange.toLowerCase());
       localStorage.setItem('cm_login_period', getCurrentPeriod());
       loadSavedData();
       
@@ -1500,9 +1559,10 @@ function conectar() {
       return; 
   }
   
-  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret'];
+  var fields = ['telegramId', 'anthropicKey', 'bitunixKey', 'bitunixSecret', 'weexKey', 'weexSecret', 'weexPassphrase'];
   fields.forEach(function(f) {
-    localStorage.setItem('cm_' + f, document.getElementById(f).value.trim());
+    var el = document.getElementById(f);
+    if(el) localStorage.setItem('cm_' + f, el.value.trim());
   });
   
   document.getElementById('statusDot').classList.add('live');
@@ -1510,8 +1570,8 @@ function conectar() {
   
   var badge = document.getElementById('exchBadge');
   badge.style.display = 'inline-flex';
-  badge.className = 'exch-badge bitunix';
-  badge.textContent = 'Bitunix';
+  badge.className = 'exch-badge ' + activeExchange;
+  badge.textContent = activeExchange.charAt(0).toUpperCase() + activeExchange.slice(1);
   
   showToast('Conectado y APIs guardadas', 'success');
   
@@ -1563,7 +1623,7 @@ function bitunixReq(ep, body) {
   var apiKey = document.getElementById('bitunixKey').value.trim();
   var secret = document.getElementById('bitunixSecret').value.trim();
   if (!apiKey || !secret) { 
-      showToast('Introduce Bitunix credenciales', 'error'); 
+      showToast('Introduce credenciales Bitunix completas', 'error'); 
       return Promise.resolve(null); 
   }
   body.apiKey = apiKey; 
@@ -1571,15 +1631,29 @@ function bitunixReq(ep, body) {
   return srvReq(RENDER_SERVER + '/bitunix/' + ep, body);
 }
 
+function weexReq(ep, body) {
+  var apiKey = document.getElementById('weexKey').value.trim();
+  var secret = document.getElementById('weexSecret').value.trim();
+  var passphrase = document.getElementById('weexPassphrase').value.trim();
+  if (!apiKey || !secret || !passphrase) { 
+      showToast('Introduce credenciales Weex completas', 'error'); 
+      return Promise.resolve(null); 
+  }
+  body.apiKey = apiKey; 
+  body.secret = secret;
+  body.passphrase = passphrase;
+  return srvReq(RENDER_SERVER + '/weex/' + ep, body);
+}
+
 function fetchOrders() {
-  var req = bitunixReq('orders', {});
+  var req = activeExchange === 'weex' ? weexReq('orders', {}) : bitunixReq('orders', {});
   req.then(function(res) {
     var orders = [];
     if (res && res.data && res.data.length) {
       orders = res.data.map(function(o) {
         if (!o.symbol) return null;
         var isLong = false;
-        if (o.side === 'BUY' || o.side === 1 || String(o.side).toUpperCase() === 'LONG') {
+        if (o.side === 'BUY' || o.side === 1 || String(o.side).toUpperCase().includes('LONG')) {
             isLong = true;
         }
         
@@ -1612,12 +1686,21 @@ function fetchOrders() {
 }
 
 function fetchPositions() {
-  var p = bitunixReq('positions', {});
-  p.then(function(res) {
+  var reqFn = activeExchange === 'weex' ? weexReq('positions', {}) : bitunixReq('positions', {});
+  reqFn.then(function(res) {
     var positions = [];
     if (res && res.code === 0 && res.data && res.data.length) {
       positions = res.data.map(function(p) {
-        return { symbol: p.symbol, side: p.side === 'LONG' ? 'LONG' : 'SHORT', entry: parseFloat(p.avgOpenPrice || 0), qty: p.qty, liq: parseFloat(p.liqPrice || 0), lev: p.leverage, pnl: parseFloat(p.unrealizedPNL || 0) };
+        var isLong = (p.side === 'LONG' || p.positionType === 1 || String(p.side).includes('long') || String(p.position_type).includes('long'));
+        return { 
+            symbol: p.symbol, 
+            side: isLong ? 'LONG' : 'SHORT', 
+            entry: parseFloat(p.avgOpenPrice || p.openPrice || 0), 
+            qty: p.qty || p.size || 0, 
+            liq: parseFloat(p.liqPrice || p.liquidationPrice || 0), 
+            lev: p.leverage, 
+            pnl: parseFloat(p.unrealizedPNL || p.unrealizedPnl || 0) 
+        };
       });
     }
     
@@ -1699,20 +1782,17 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
   }
 
   var totalRawQty = usdt * lev / precioEjecucion;
-  var reqFn = bitunixReq;
+  var reqFn = activeExchange === 'weex' ? weexReq : bitunixReq;
   var symParam = sym + 'USDT';
-  var qtyParam = 'qty';
-  var otParam = 'orderType';
-
+  
   var levBody = { symbol: symParam, leverage: lev };
 
   reqFn('leverage', levBody).then(function() {
-    showToast('Enviando órdenes (' + tramos.length + ' tramos) a Bitunix...', '');
+    showToast('Enviando órdenes (' + tramos.length + ' tramos) a ' + activeExchange.toUpperCase() + '...', '');
     
     var promises = tramos.map(function(tramo, index) {
       
-      // Ajuste dinámico de decimales para evitar el Parameter Error en altcoins
-      var decimalesQty = 0; // Por defecto cantidades enteras para XRP, XLM, DOGE, etc.
+      var decimalesQty = 0; 
       if (sym === 'BTC') decimalesQty = 3;
       else if (sym === 'ETH') decimalesQty = 2;
       else if (sym === 'SOL') decimalesQty = 1;
@@ -1724,15 +1804,15 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
       }
       
       var orderBody = { symbol: symParam, side: side, sl: slFinal, tp: tramo.price };
-      orderBody[qtyParam] = qtyTranche;
+      orderBody.qty = qtyTranche; 
       
       if (tipoOrden === 'market') {
-        orderBody[otParam] = 'market';
+        orderBody.orderType = 'market';
       } else if (tipoOrden === 'limit') {
-        orderBody[otParam] = 'limit';
+        orderBody.orderType = 'limit';
         orderBody.price = entradaFinal;
       } else if (tipoOrden === 'stop_market') {
-        orderBody[otParam] = 'stop_market';
+        orderBody.orderType = 'stop_market';
         orderBody.triggerPrice = triggerPriceFinal;
         orderBody.price = entradaFinal; 
       }
@@ -1742,7 +1822,7 @@ function ejecutarDesdeCard(sym, uid, side, entrada, sl, tp, leverage, orderType)
 
     return Promise.all(promises);
   }).then(function(results) {
-    var allOk = results.every(function(r) { return r && (r.code === 0 || r.code === 1000); });
+    var allOk = results.every(function(r) { return r && (r.code === 0 || r.code === 1000 || r.code === '0'); });
     var msg = results[0] && (results[0].msg || results[0].message) || 'Error desconocido';
     
     var tpListHtml = tramos.map(function(t, i) { 
@@ -1788,7 +1868,7 @@ function mostrarResultadoOrdenMulti(ok, side, sym, usdt, precio, sl, tpListHtml,
   var w = document.getElementById('welcome'); 
   if (w) w.style.display = 'none';
   
-  var exchName = 'Bitunix';
+  var exchName = activeExchange.toUpperCase();
   var otLabel = { market: 'MERCADO', limit: 'LÍMITE', stop_market: 'ACTIVADOR (STOP)' }; 
   var displayType = otLabel[orderType] || orderType.toUpperCase();
   
